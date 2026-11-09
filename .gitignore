@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+dist-ssr/
+coverage/
+*.local
+
+# Environment (commit .env.example only)
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Supabase CLI
+supabase/.branches/
+supabase/.temp/
+
+# Vercel
+.vercel/
+
+# Python / uv (ml/)
+ml/.venv/
+ml/__pycache__/
+ml/**/__pycache__/
+ml/*.egg-info/
+ml/.pytest_cache/
+ml/.ruff_cache/
+
+# Recorded training samples are personal; opt in explicitly if you want them tracked
+ml/data/raw/
