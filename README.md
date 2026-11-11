@@ -1,36 +1,151 @@
 # Jutsu Duel (working title)
 
-A desktop web game where two players fight by performing Naruto-style hand signs on their webcam.
-Completing a sign sequence casts a jutsu that damages the opponent; the first to bring the other to
-0 HP wins. Version 1 is a playable demo against a bot. Online 1v1 with live webcam video follows.
+A desktop web game where you fight by performing Naruto-style hand signs on your webcam.
+Hold a sign for a quarter second to register it; complete a sequence to cast a jutsu that flies
+at your opponent. Five elements beat each other in a cycle, longer sequences hit harder, two
+jutsu in the air at once clash, and a two-sign Substitution lets you dodge. First to bring the
+other fighter to 0 HP in two minutes wins.
 
-Status: milestone v0.1.0 (scaffold, design system, routing, auth). Live status in
-`docs/PROGRESS.md`; design in `docs/DESIGN.md` and `docs/FRONTEND_DESIGN.md`; conventions in
-`CLAUDE.md`.
+Version 1 is a playable demo against a bot with three difficulties, using the webcam or the
+keyboard. Online 1v1 with live webcam video is designed and follows. Every piece of
+franchise-specific wording lives in one content config, and all art, glyphs and sounds are
+original, so the theme can be swapped.
+
+![Landing page](docs/screenshots/landing.png)
+
+## Status
+
+Milestone v0.6.0: the full single-player demo. Live status, the update log and the roadmap are in
+[`docs/PROGRESS.md`](docs/PROGRESS.md); release notes in [`CHANGELOG.md`](CHANGELOG.md); the
+product and technical design in [`docs/DESIGN.md`](docs/DESIGN.md) and the visual design in
+[`docs/FRONTEND_DESIGN.md`](docs/FRONTEND_DESIGN.md); working conventions in
+[`CLAUDE.md`](CLAUDE.md).
+
+Two things need the owner's hands before the demo is complete end to end: a Supabase project
+for accounts and match history (the app runs without one, see below), and recorded hand-sign
+samples to train the recognition model (keyboard mode works without one).
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Pre-battle camera check](docs/screenshots/play-webcam.png) | ![A jutsu in flight](docs/screenshots/battle.png) |
+| Pre-battle: the camera check asks you to hold one sign so the whole pipeline is proven first | The battle stage: HP bars, timer, flight strip, both sign trails, the Substitution seal |
+| ![Results](docs/screenshots/results.png) | ![Practice](docs/screenshots/practice.png) |
+| Results with the jutsu used and the match stats | Practice one jutsu with per-sign feedback |
+| ![Jutsu Book](docs/screenshots/jutsu-book.png) | ![Settings](docs/screenshots/settings.png) |
+| The Jutsu Book: every sequence, what beats what | Settings: theme, input, camera, keys, account |
+
+The light theme is a setting; the landing page in it is at
+[`docs/screenshots/landing-light.png`](docs/screenshots/landing-light.png).
 
 ## Setup
 
-Requirements: Node 22 or newer, a Supabase project.
+Requirements: Node 22 or newer, a desktop browser (Chrome or Edge recommended, 1280 px wide or
+more), and optionally a Supabase project and `uv` for training.
 
 ```
 npm install
-cp .env.example .env.local        # then fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
+cp .env.example .env.local        # optional: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 npm run dev                       # http://localhost:5173
 ```
 
-Apply the database schema once per Supabase project: see `supabase/README.md` (CLI `supabase db
-push`, or paste the files in `supabase/migrations/` into the SQL editor in order).
+Without the Supabase variables the login page offers "Continue as dev user" in development
+builds, so the whole game can be played locally; matches are simply not saved. With them, apply
+the schema once per project as described in [`supabase/README.md`](supabase/README.md)
+(`supabase db push`, or paste `supabase/migrations/*.sql` into the SQL editor in order).
 
-Without the two environment variables the app still runs, but sign up and log in report that
-accounts are not configured.
+### Playing with the keyboard
+
+Pick "Keyboard" on the pre-battle page. Each sign has a key; hold it for a quarter second.
+
+| Key | Sign | Key | Sign | Key | Sign |
+|---|---|---|---|---|---|
+| Q | Rat | A | Dragon | Z | Monkey |
+| W | Ox | S | Snake | X | Bird |
+| E | Tiger | D | Horse | C | Dog |
+| R | Hare | F | Ram | V | Boar |
+
+Keys can be rebound in Settings. The sequences are listed in the Jutsu Book in the app.
+
+### Playing with the webcam
+
+Webcam mode needs a trained recognition model at `public/models/signs-v1.json`, which is not in
+the repository because it is trained from your own recordings:
+
+1. `npm run dev`, open `/dev/recorder`, allow the camera, pick a label and capture about 100
+   samples per sign (move and rotate your hands a little while it counts). Record `none` too:
+   idle hands, transitions, one hand only. Export the session, ideally more than one on
+   different days or lighting.
+2. Put the exported files in `ml/data/raw/` and train:
+
+   ```
+   cd ml
+   uv sync
+   uv run train --data data/raw/*.json --out ../public/models/signs-v1.json
+   ```
+
+3. Reload the app. The pre-battle camera check now asks you to hold the Ram sign; once it
+   registers, "Start battle" unlocks.
+
+Details, options and the evaluation command are in [`ml/README.md`](ml/README.md). The recorder
+also shows the live prediction of the installed model, so a new model can be judged by eye.
+
+![Recorder](docs/screenshots/recorder.png)
 
 ## Commands
 
 ```
-npm run dev          dev server with dev-only routes (/dev/styleguide, /dev/recorder)
-npm run build        production build
-npm run check        lint, format check, typecheck and tests; the merge gate
-npm test             tests only
+npm run dev            dev server with the dev-only routes (/dev/styleguide, /dev/recorder)
+npm run build          production build to dist/
+npm run preview        serve the production build locally
+npm run check          lint, format check, typecheck and tests; the merge gate for main
+npm test               tests only (npm run test:watch to keep them running)
+npm run format         write Prettier formatting
+npm run db:types       regenerate src/lib/database.types.ts from a linked Supabase project
+
+cd ml && uv run pytest                 trainer tests, including TS/Python feature parity
+cd ml && uv run train ...              train and export the model
+cd ml && uv run evaluate ...           per-class report for an exported model
 ```
 
-The Python training tooling in `ml/` arrives in milestone v0.6.0 and is managed with `uv`.
+## How it is built
+
+React 19, TypeScript, Vite and React Router on the front; Supabase (Auth and Postgres with Row
+Level Security) for accounts, settings and match history; MediaPipe Hand Landmarker in the
+browser for hand tracking; a small MLP trained with PyTorch and evaluated in plain TypeScript
+for sign recognition. Vitest, ESLint and Prettier guard `main`.
+
+```
+src/engine/      The battle engine: pure, deterministic, timestamp-driven, no DOM. Typed events.
+src/content/     Everything themed and tunable: names, flavour text, the roster, the balance config.
+src/detection/   Camera, MediaPipe wrapper, the hands-v1 feature extractor, keyboard and ML detectors.
+src/opponent/    The OpponentSource contract and the seeded bot (a remote player fits the same shape).
+src/features/    Battle controller and HUD, practice, settings sync, results, history, recorder.
+src/pages/       One file per route. src/components/ holds the design-system primitives.
+src/lib/         Supabase client, settings store, API modules, small hooks.
+supabase/        Migrations with RLS. ml/ is the uv-managed trainer. docs/ holds the design and progress.
+```
+
+The engine takes registered signs with timestamps and emits events (`jutsuCast`, `clash`, `hit`,
+`dodge`, `ko`, ...). A detector produces per-frame sign predictions; a stabiliser turns them into
+registered signs after a 250 ms hold. The keyboard detector and the webcam detector are
+interchangeable, so the bot, the controller and the tests never know which one is in use. All
+rules and numbers (100 HP, 120 s round, 12/18/26/36 damage for 3 to 6 signs, 1.5 s flight,
+1.5x and 0.5x clash multipliers, the 8 s Substitution cooldown, the 2.5 s buffer reset) live in
+`src/content/balance.config.ts`.
+
+## Deploying
+
+`vercel.json` configures a static Vite deployment: the SPA rewrite, camera permission for the
+site's own origin, and cache headers for hashed assets and the model file. Set
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the project's environment; set
+`VITE_ENABLE_DEV_TOOLS=true` on preview deployments if you want the recorder there. Commit a
+trained `public/models/signs-v1.json` to ship webcam mode. Nothing deploys automatically.
+
+## Contributing to this repository
+
+Work happens on `feat/`, `fix/`, `docs/`, `chore/` and `test/` branches merged into `main` with
+`--no-ff` once `npm run check` passes. Commits follow Conventional Commits with a scope.
+Milestones are tagged `v0.x.0` and recorded in `CHANGELOG.md`; `docs/PROGRESS.md` logs every
+branch. Never commit `.env.local`.
