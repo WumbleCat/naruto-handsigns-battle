@@ -39,9 +39,13 @@ match against the hard bot was driven end to end in headless Chrome with no cons
 171 tests pass. Webcam play waits on the recognition model (v0.6.0); live saving waits on the
 owner's Supabase project.
 
-Milestone v0.5.0 is in progress: Settings, the Jutsu Book and Practice are complete.
+Milestone v0.5.0 is complete and tagged: every v1 page exists and is built to the design doc.
+Settings (synced to Supabase), the Jutsu Book, Practice and Match History joined the playable
+battle. 188 tests pass. Webcam play still waits on the recognition model.
 
-Next action: `feat/match-history`, then tag v0.5.0.
+Next action: milestone v0.6.0, starting with `feat/ml-training` (the uv-managed trainer in
+`ml/` with the feature-parity test), then `feat/ml-detector`, `chore/vercel-config` and
+`docs/readme` with screenshots.
 
 ## Milestone tracker
 
@@ -52,7 +56,7 @@ Next action: `feat/match-history`, then tag v0.5.0.
 | v0.2.0 | Battle engine with full tests | Done | v0.2.0 | 2026-11-11 |
 | v0.3.0 | Webcam, MediaPipe overlay, keyboard detector, recorder route | Done | v0.3.0 | 2026-11-11 |
 | v0.4.0 | Battle page vs bot, results, match saved to Supabase | Done | v0.4.0 | 2026-11-11 |
-| v0.5.0 | Practice, Jutsu Book, Match History, Settings | In progress | | |
+| v0.5.0 | Practice, Jutsu Book, Match History, Settings | Done | v0.5.0 | 2026-11-11 |
 | v0.6.0 | Training script, ML detector wired in, polish, README, Vercel config | Not started | | |
 | v1.0.0 | Online 1v1: matchmaking, WebRTC video, Realtime signalling, sync, disconnects | Planned | | |
 
@@ -65,6 +69,11 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/match-history`: Match History lists your matches from Supabase newest first: date,
+  opponent, result with how it ended, duration, HP left, the jutsu used as seals with counts
+  and an overflow mark, a summary sentence from count queries, result and difficulty filters,
+  "Load more" paging by cursor, and loading, empty, filtered-empty, error and no-account states.
+  Tagged v0.5.0.
 - `feat/practice`: Practice is complete. The list page offers free practice and every jutsu;
   the jutsu page shows the camera with the readout, the sequence stamping sign by sign with a
   hold ring on the current one, a shake on a wrong sign, the jutsu name stamping on completion,
