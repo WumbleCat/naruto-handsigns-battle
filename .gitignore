@@ -51,3 +51,6 @@ ml/.ruff_cache/
 
 # Recorded training samples are personal; opt in explicitly if you want them tracked
 ml/data/raw/
+
+# Claude Code personal overrides
+.claude/settings.local.json

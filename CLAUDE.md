@@ -132,13 +132,24 @@ docs/            design docs, screenshots
   normalises line endings to LF.
 - Phase 0 design docs live on `docs/design-doc`.
 
+## Progress tracking (required)
+
+- `docs/PROGRESS.md` is the living status page: where the project is, a milestone tracker, a
+  dated update log, the roadmap and pending decisions. Update it after every commit, merge, tag
+  or scope change by following the `update-progress` skill
+  (`.claude/skills/update-progress/SKILL.md`, invoked as `/update-progress`).
+- A Stop hook (`.claude/hooks/progress-check.mjs`, configured in `.claude/settings.json`)
+  blocks the end of a turn while the current branch has non-merge commits newer than the file's
+  last commit. Do not work around it; update the file and commit it as `docs(progress): ...`.
+- `CHANGELOG.md` is separate: per-version release notes, updated at each tag.
+
 ## Milestones
 
 `v0.1.0` scaffold, tokens, routing, auth → `v0.2.0` engine + tests → `v0.3.0` camera, MediaPipe,
 keyboard detector, recorder → `v0.4.0` battle vs bot, results, persistence → `v0.5.0` practice,
 jutsu book, history, settings → `v0.6.0` training script, ML detector, polish, README, Vercel
-config. Details and branch plan in `docs/DESIGN.md` section 12. Give the owner a short summary at
-each tag.
+config. Details and branch plan in `docs/DESIGN.md` section 12; live status in
+`docs/PROGRESS.md`. Give the owner a short summary at each tag.
 
 ## Do not
 
