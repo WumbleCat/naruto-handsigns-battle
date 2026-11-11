@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": [".claude/hooks/progress-check.mjs"],
+            "timeout": 15,
+            "statusMessage": "Checking docs/PROGRESS.md is current"
+          }
+        ]
+      }
+    ]
+  }
+}

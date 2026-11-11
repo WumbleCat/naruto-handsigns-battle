@@ -1,7 +1,8 @@
 # Jutsu Duel: Front-end Design
 
-Status: Phase 0 proposal, awaiting approval. Product rules and architecture live in
-`docs/DESIGN.md`; this document covers how the game looks, reads and moves.
+Status: approved by the owner on 2026-11-11 with one addition, a light theme (section 10).
+Product rules and architecture live in `docs/DESIGN.md`; this document covers how the game
+looks, reads and moves.
 
 If Claude Design exports or links are provided later, they override anything here.
 
@@ -61,7 +62,8 @@ things from that world and nothing else:
 
 Element colours are spaced by hue and by lightness so Fire/Earth and Earth/Lightning stay
 distinguishable; every element also always appears with its glyph and name, never colour alone.
-All text colours above meet WCAG AA on the surfaces they are used on.
+All text colours above meet WCAG AA on the surfaces they are used on. This table is the dark
+theme; the light theme's values and the semantic tokens that map between them are in section 3.
 
 ### 2.3 Typography
 
@@ -154,17 +156,20 @@ there is no monospace, no eyebrow labels, and no appended arrows on links.
 ## 3. Design tokens
 
 Delivered as CSS custom properties in `src/styles/tokens.css`, consumed through CSS Modules.
-Components never use raw hex values.
+Components never use raw hex values and never reference a primitive (`--ink-800`) directly;
+they use the semantic tokens, which is what makes the light theme a token swap rather than a
+second stylesheet.
+
+### 3.1 Primitives
 
 ```css
 :root {
-  /* colour: see table in 2.2 */
+  /* ink scale (dark theme ground) */
   --ink-950: #0C1627; --ink-900: #111F36; --ink-800: #182A47; --ink-700: #22365A;
-  --ink-600: #31487A; --ink-400: #7D8FB3; --ink-200: #C5CEE0;
-  --paper: #F4EFE4; --paper-dim: #E2DBCB;
-  --fire: #FF5A3C; --wind: #7ED9A3; --lightning: #F5E663; --earth: #C98A4B; --water: #5EB8F5;
-  --substitution: #B9A7E8;
-  --danger: #FF6B8A; --ok: #8BE0B0; --warn: #F5C663;
+  --ink-600: #31487A; --ink-500: #4A628F; --ink-400: #7D8FB3; --ink-200: #C5CEE0;
+  /* paper scale (light theme ground, dark theme actions) */
+  --paper-50: #FBF8F2; --paper-100: #F4EFE4; --paper-200: #EAE2D3; --paper-300: #D9CFBB;
+  --paper-400: #BFB29A;
 
   /* type */
   --font-display: 'Yuji Syuku', 'Hiragino Mincho ProN', Georgia, serif;
@@ -182,11 +187,6 @@ Components never use raw hex values.
   --radius-md: 8px;    /* panels, cards, buttons, video panels */
   --radius-full: 999px;/* seals, HP bar ends, pills */
 
-  /* borders and focus */
-  --border: 1px solid var(--ink-700);
-  --border-strong: 1px solid var(--ink-600);
-  --focus-ring: 2px solid var(--paper); --focus-offset: 2px;
-
   /* motion */
   --dur-fast: 120ms; --dur-base: 200ms; --dur-slow: 320ms; --dur-ghost: 600ms;
   --dur-flight: 1500ms;                 /* set from balance.config at runtime */
@@ -202,17 +202,88 @@ Components never use raw hex values.
 }
 ```
 
-Element colour is applied through a `data-element` attribute that sets `--element-color`, so a
-single `Seal`, `HpBar` or `JutsuRow` stylesheet works for every element:
+### 3.2 Semantic tokens, dark theme (default)
+
+```css
+:root, [data-theme='dark'] {
+  color-scheme: dark;
+  --bg: var(--ink-900);            /* page ground */
+  --bg-stage: var(--ink-950);      /* battle stage, dialog scrim base */
+  --surface: var(--ink-800);       /* panels, inputs, seals */
+  --surface-2: var(--ink-700);     /* hover surface, tracks */
+  --border: var(--ink-700);
+  --border-strong: var(--ink-600);
+  --text: var(--paper-100);
+  --text-2: var(--ink-200);
+  --text-muted: var(--ink-400);    /* 5.1:1 on --bg */
+  --action: var(--paper-100);      /* primary button fill */
+  --action-hover: var(--paper-200);
+  --action-text: var(--ink-900);
+  --focus: var(--paper-100);
+  --hp-fill: var(--paper-100);
+  --fire: #FF5A3C; --wind: #7ED9A3; --lightning: #F5E663; --earth: #C98A4B; --water: #5EB8F5;
+  --substitution: #B9A7E8;
+  --danger: #FF6B8A; --ok: #8BE0B0; --warn: #F5C663;
+}
+```
+
+### 3.3 Semantic tokens, light theme
+
+The light theme is the same world seen in daylight: paper ground, ink text and ink actions.
+Element colours get darker, more saturated values so they still pass AA as text on paper.
+
+```css
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: var(--paper-100);
+  --bg-stage: var(--paper-200);
+  --surface: var(--paper-50);
+  --surface-2: var(--paper-200);
+  --border: var(--paper-300);
+  --border-strong: var(--paper-400);
+  --text: var(--ink-900);
+  --text-2: var(--ink-700);
+  --text-muted: var(--ink-500);    /* 5.3:1 on --bg */
+  --action: var(--ink-900);
+  --action-hover: var(--ink-700);
+  --action-text: var(--paper-100);
+  --focus: var(--ink-900);
+  --hp-fill: var(--ink-900);
+  --fire: #C4341C; --wind: #1E7A4B; --lightning: #7A5F00; --earth: #8A4E1C; --water: #1562A8;
+  --substitution: #5B44A8;
+  --danger: #B5174E; --ok: #1F7F5C; --warn: #8A5A00;
+}
+```
+
+| Token | Dark | Light | Contrast as text on `--bg` |
+|---|---|---|---|
+| `--fire` | `#FF5A3C` | `#C4341C` | 5.3 / 4.8 |
+| `--wind` | `#7ED9A3` | `#1E7A4B` | 9.7 / 4.7 |
+| `--lightning` | `#F5E663` | `#7A5F00` | 13 / 5.3 |
+| `--earth` | `#C98A4B` | `#8A4E1C` | 5.7 / 5.8 |
+| `--water` | `#5EB8F5` | `#1562A8` | 7.6 / 5.5 |
+| `--substitution` | `#B9A7E8` | `#5B44A8` | 8.6 / 6.5 |
+
+### 3.4 Theme selection
+
+- `<html data-theme="dark|light">` is the only switch. A tiny inline script in `index.html` sets
+  it before first paint from the stored setting, falling back to `prefers-color-scheme`, so the
+  page never flashes the wrong theme.
+- Settings gains an Appearance section: Theme, a segmented control with System, Dark and Light.
+  "System" follows the OS and updates live when the OS switches.
+- The choice is stored with the other settings (`theme: 'system' | 'dark' | 'light'`, default
+  `system`) and cached in `localStorage` so it applies before login and before Supabase answers.
+- Element colour is applied through a `data-element` attribute that sets `--element-color`, so a
+  single `Seal`, `HpBar` or `JutsuRow` stylesheet works for every element in both themes:
 
 ```css
 [data-element='fire'] { --element-color: var(--fire); }
 [data-element='substitution'] { --element-color: var(--substitution); }
 ```
 
-Single theme. The game is dark by design; no light mode in v1.
-
----
+- Video panels, the landmark overlay and the sign skeleton references use the semantic text
+  tokens, so they read correctly on both grounds. Screenshots for the README are taken in both
+  themes.
 
 ## 4. Iconography and illustration (all original)
 
@@ -275,7 +346,7 @@ written pose description from the content config.
 
 ### 4.5 Landmark overlay
 
-Joints: 4 px dots in `--paper` at 85 % alpha. Bones: 2 px lines in `--ink-200` at 70 %. Alpha
+Joints: 4 px dots in `--text` at 85 % alpha. Bones: 2 px lines in `--text-2` at 70 %. Alpha
 scales with detection confidence, so an uncertain pose looks faint and a confident one crisp.
 No colour tinting by element: the overlay reports tracking quality only.
 
@@ -575,6 +646,8 @@ States: loading (six skeleton rows), empty ("No matches yet. Your first duel sta
 Sectioned form, label column 240 px, control column 560 px, auto-saved with a per-section
 "Saved" line that appears for 2 s.
 
+- Appearance: Theme as a segmented control with System, Dark and Light. Applies instantly;
+  System follows the OS and updates live.
 - Input: segmented Webcam / Keyboard.
 - Camera: camera select (labels appear after permission; "Allow camera to see names"), "Test
   camera" opens a 320 px live preview, Mirror video toggle, Show landmarks toggle, Detection
@@ -644,7 +717,8 @@ cooling. No entrance animations on page sections.
   ("Opponent took 18 damage. 46 HP left."), throttled to one announcement per second.
 - Video elements are `muted` and `playsInline`; the overlay canvas is `aria-hidden`.
 - Dialogs trap focus, restore it on close, and label themselves.
-- Text contrast meets AA on its surface; large brush headings meet AA for large text.
+- Text contrast meets AA on its surface in both themes; large brush headings meet AA for large
+  text. Element colours have separate light-theme values for the same reason.
 - `prefers-reduced-motion` follows the table in section 7.
 - Keyboard mode makes the whole game playable without a camera; key bindings are rebindable.
 
@@ -655,6 +729,11 @@ cooling. No entrance animations on page sections.
 - CSS Modules per component plus `src/styles/tokens.css` and `src/styles/global.css` (reset,
   fonts, base type). No utility framework and no component library; the inventory above is small
   enough to own.
+- Theme: a `ThemeProvider` owns the `theme` setting, writes `data-theme` on `<html>`, and
+  listens to `prefers-color-scheme` while the setting is `system`. An inline script in
+  `index.html` applies the cached choice before React loads so there is no flash. Components only
+  ever use semantic tokens (`--bg`, `--surface`, `--text`, `--action`, element tokens), never
+  the ink or paper primitives.
 - Fonts via `@fontsource/yuji-syuku` and `@fontsource/zen-kaku-gothic-new` (400, 500, 700),
   `font-display: swap`, preloaded on the landing and battle routes.
 - Element theming through `data-element` and `--element-color`; never per-element class names.
@@ -669,14 +748,16 @@ cooling. No entrance animations on page sections.
 
 ---
 
-## 10. Decisions needing a yes or no
+## 10. Decisions
 
-1. Palette: indigo ground, paper actions, five element colours as specified (2.2).
-2. Type: Yuji Syuku for display and Zen Kaku Gothic New for text (2.3). Alternatives if the brush
-   face feels too strong: Shippori Antique B1 (bold antique gothic) for display with the same
-   text face.
+Approved by the owner on 2026-11-11:
+
+1. Palette: indigo ground, paper actions, five element colours (2.2).
+2. Type: Yuji Syuku for display and Zen Kaku Gothic New for text (2.3).
 3. Home as a brush index with a preview panel rather than a card grid (6.3).
-4. The flight strip as a full-width band above the video panels, with instant clash at the centre
-   (6.5), rather than projectiles drawn over the video.
+4. The flight strip as a full-width band above the video panels, with instant clash at the
+   centre (6.5).
 5. Hand-pose references as rendered landmark skeletons captured through the recorder (4.4).
-6. Single dark theme, no light mode.
+6. Two themes instead of one: dark by default, light by system preference or by choice in
+   Settings (3.3 and 3.4). The light theme was the owner's addition to the proposal; it is a
+   semantic-token swap, not a second design.
