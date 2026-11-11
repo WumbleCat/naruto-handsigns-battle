@@ -43,9 +43,11 @@ Milestone v0.5.0 is complete and tagged: every v1 page exists and is built to th
 Settings (synced to Supabase), the Jutsu Book, Practice and Match History joined the playable
 battle. 188 tests pass. Webcam play still waits on the recognition model.
 
-Next action: milestone v0.6.0, starting with `feat/ml-training` (the uv-managed trainer in
-`ml/` with the feature-parity test), then `feat/ml-detector`, `chore/vercel-config` and
-`docs/readme` with screenshots.
+Milestone v0.6.0 is in progress: the uv-managed trainer in `ml/` is done, with the feature
+parity test passing against the TypeScript golden file.
+
+Next action: `feat/ml-detector` (browser classifier and the webcam detector), then
+`chore/vercel-config` and `docs/readme` with screenshots, then tag v0.6.0.
 
 ## Milestone tracker
 
@@ -57,7 +59,7 @@ Next action: milestone v0.6.0, starting with `feat/ml-training` (the uv-managed 
 | v0.3.0 | Webcam, MediaPipe overlay, keyboard detector, recorder route | Done | v0.3.0 | 2026-11-11 |
 | v0.4.0 | Battle page vs bot, results, match saved to Supabase | Done | v0.4.0 | 2026-11-11 |
 | v0.5.0 | Practice, Jutsu Book, Match History, Settings | Done | v0.5.0 | 2026-11-11 |
-| v0.6.0 | Training script, ML detector wired in, polish, README, Vercel config | Not started | | |
+| v0.6.0 | Training script, ML detector wired in, polish, README, Vercel config | In progress | | |
 | v1.0.0 | Online 1v1: matchmaking, WebRTC video, Realtime signalling, sync, disconnects | Planned | | |
 
 Statuses: Planned, Not started, In progress, In review, Done, Blocked.
@@ -69,6 +71,13 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/ml-training`: The trainer exists as a uv project in `ml/`. It loads recorder exports,
+  re-implements the hands-v1 features in Python (a golden file written by the TypeScript
+  extractor proves they match to 1e-6), splits validation by recording session, augments with
+  jitter, scale, rotation and optional mirroring, trains the 131 → 128 → 64 → 13 MLP with
+  class weights and early stopping, prints per-class recall, and exports the browser JSON. A
+  pure-numpy forward pass over the export must agree with the torch model before it is
+  written. `uv run pytest` passes, including an end-to-end training smoke test.
 - `feat/match-history`: Match History lists your matches from Supabase newest first: date,
   opponent, result with how it ended, duration, HP left, the jutsu used as seals with counts
   and an overflow mark, a summary sentence from count queries, result and difficulty filters,
