@@ -11,10 +11,10 @@ import type { OpponentSource } from '../../opponent/types';
 
 export type ControllerPhase = 'idle' | 'active' | 'paused' | 'ended';
 
-export interface BattleControllerOptions {
+export interface BattleControllerOptions<D extends SignDetector = SignDetector> {
   balance: EngineBalance & { signHoldMs: number };
   roster: readonly JutsuDef[];
-  detector: SignDetector;
+  detector: D;
   opponent: OpponentSource;
   confidenceThreshold: number;
   /** Wall clock in ms; defaults to performance.now. */
@@ -32,13 +32,13 @@ export interface HoldState {
 
 type Unsubscribe = () => void;
 
-export class BattleController {
+export class BattleController<D extends SignDetector = SignDetector> {
   readonly localPlayer: PlayerId = 'p1';
   readonly engine: BattleEngine;
   readonly stabilizer: SignStabilizer;
   readonly opponent: OpponentSource;
-
-  private readonly detector: SignDetector;
+  /** Public so the page can hand a webcam detector its landmark frames. */
+  readonly detector: D;
   private readonly now: () => number;
   private readonly schedule: ((callback: () => void) => number) | null;
   private readonly cancel: (handle: number) => void;
@@ -50,7 +50,7 @@ export class BattleController {
   private readonly cleanups: Unsubscribe[] = [];
   private readonly phaseListeners = new Set<(phase: ControllerPhase) => void>();
 
-  constructor(options: BattleControllerOptions) {
+  constructor(options: BattleControllerOptions<D>) {
     this.now = options.now ?? (() => performance.now());
     this.schedule =
       options.schedule === undefined

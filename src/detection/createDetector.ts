@@ -1,22 +1,38 @@
+import { BALANCE } from '../content/balance.config';
 import type { InputMode, Settings } from '../lib/settings/schema';
+import type { SignClassifier } from './classifier';
 import { KeyboardSignDetector } from './keyboard';
-import { DetectorError, type SignDetector } from './types';
+import { MlSignDetector } from './ml';
+import { modelStore } from './model';
+import { DetectorError } from './types';
 
-/**
- * Whether a trained recognition model ships with this build. Flipped to a real check when the
- * ML detector lands (milestone v0.6.0); until then webcam mode cannot register signs.
- */
-export function isModelAvailable(): boolean {
-  return false;
+export { isModelAvailable } from './model';
+
+/** The detectors the app actually builds; narrow on `kind` to reach their extras. */
+export type AppSignDetector = KeyboardSignDetector | MlSignDetector;
+
+export const NO_MODEL_MESSAGE =
+  'No recognition model is installed yet. Keyboard mode is available.';
+
+function loadedClassifier(): SignClassifier | null {
+  const model = modelStore.get();
+  return model.status === 'available' ? model.classifier : null;
 }
 
-/** Builds the detector for the chosen input mode from the player's settings. */
-export function createSignDetector(mode: InputMode, settings: Settings): SignDetector {
+/**
+ * Builds the detector for the chosen input mode from the player's settings. Webcam mode needs
+ * the recognition model, which `modelStore.load()` fetches at startup; pages check
+ * `useModelState()` before getting here so the throw is a programming error, not a user path.
+ */
+export function createSignDetector(
+  mode: InputMode,
+  settings: Settings,
+  options: { classifier?: SignClassifier } = {},
+): AppSignDetector {
   if (mode === 'keyboard') {
     return new KeyboardSignDetector({ bindings: settings.keyBindings });
   }
-  throw new DetectorError(
-    'model',
-    'No recognition model is installed yet. Keyboard mode is available.',
-  );
+  const classifier = options.classifier ?? loadedClassifier();
+  if (!classifier) throw new DetectorError('model', NO_MODEL_MESSAGE);
+  return new MlSignDetector({ classifier, smoothingAlpha: BALANCE.smoothingAlpha });
 }

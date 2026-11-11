@@ -1,6 +1,6 @@
 # Progress and roadmap
 
-Last updated: 2026-11-11. Branch: `docs/progress-tracker`.
+Last updated: 2026-11-11. Branch: `feat/ml-detector`.
 
 This is the living status page for Jutsu Duel. It answers three questions: where the project
 is, what changed recently, and what comes next. Release notes by version live in
@@ -44,10 +44,13 @@ Settings (synced to Supabase), the Jutsu Book, Practice and Match History joined
 battle. 188 tests pass. Webcam play still waits on the recognition model.
 
 Milestone v0.6.0 is in progress: the uv-managed trainer in `ml/` is done, with the feature
-parity test passing against the TypeScript golden file.
+parity test passing against the TypeScript golden file, and the webcam detector is wired in.
+Webcam play now works end to end once a trained model sits at `public/models/signs-v1.json`;
+without one the pre-battle check, Practice and the recorder all say so. 198 tests pass. The
+pipeline was smoke-tested in headless Chrome with a model trained on synthetic poses (both
+with and without the file); recognising real hands still needs recordings from the owner.
 
-Next action: `feat/ml-detector` (browser classifier and the webcam detector), then
-`chore/vercel-config` and `docs/readme` with screenshots, then tag v0.6.0.
+Next action: `chore/vercel-config` and `docs/readme` with screenshots, then tag v0.6.0.
 
 ## Milestone tracker
 
@@ -71,6 +74,16 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/ml-detector`: Webcam play is wired through. The browser evaluates the exported MLP in
+  plain TypeScript (zod-validated file, shape checks per layer, standardise, relu, softmax); a
+  model store fetches `public/models/signs-v1.json` once at startup and tells "missing" from
+  "broken". `MlSignDetector` turns the page's landmark frames into hands-v1 features,
+  probabilities, a moving average and a sign, through the same stabiliser as the keyboard. The
+  pre-battle check now runs the real detector on the preview and asks the player to hold Ram,
+  so camera, tracking, model and hold rule are proven before a fight; without a model it says
+  keyboard mode is available, Practice falls back to the keyboard, and the recorder shows the
+  live prediction so a new model can be judged by eye. Smoke-tested in headless Chrome with a
+  synthetic model and without one, no console errors.
 - `feat/ml-training`: The trainer exists as a uv project in `ml/`. It loads recorder exports,
   re-implements the hands-v1 features in Python (a golden file written by the TypeScript
   extractor proves they match to 1e-6), splits validation by recording session, augments with

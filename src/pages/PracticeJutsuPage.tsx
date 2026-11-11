@@ -7,11 +7,13 @@ import { LinkButton } from '../components/Button/LinkButton';
 import { DetectionReadout } from '../components/DetectionReadout/DetectionReadout';
 import { PageShell } from '../components/PageShell/PageShell';
 import { Seal } from '../components/Seal/Seal';
+import { Spinner } from '../components/Spinner/Spinner';
 import { VideoPanel } from '../components/VideoPanel/VideoPanel';
 import { BALANCE } from '../content/balance.config';
 import { CONTENT } from '../content/content.config';
 import { isRosterJutsuId, ROSTER_BY_ID, type RosterJutsuDef } from '../content/roster';
-import { createSignDetector, isModelAvailable } from '../detection/createDetector';
+import { createSignDetector } from '../detection/createDetector';
+import { modelStore, useModelState } from '../detection/model';
 import { useFrameTick } from '../features/battle/hooks';
 import { KeyMap } from '../features/battle/KeyMap';
 import { useCamera } from '../features/camera/useCamera';
@@ -31,15 +33,39 @@ function formatSeconds(ms: number | null): string {
 
 export function PracticeJutsuPage() {
   const { jutsuId } = useParams();
+  const settings = useSettings();
+  const model = useModelState();
   const free = jutsuId === 'free';
   const jutsu = !free && isRosterJutsuId(jutsuId) ? ROSTER_BY_ID[jutsuId] : null;
+
+  useEffect(() => {
+    if (model.status === 'unknown') void modelStore.load();
+  }, [model.status]);
+
   if (!free && !jutsu) return <Navigate to="/practice" replace />;
-  return <PracticeSession key={jutsuId} jutsu={jutsu} />;
+  // The session picks its detector once, so wait until we know whether the model exists.
+  if (
+    settings.inputMode === 'webcam' &&
+    (model.status === 'unknown' || model.status === 'loading')
+  ) {
+    return (
+      <PageShell wide centered>
+        <Spinner label="Loading the recognition model" />
+      </PageShell>
+    );
+  }
+  return <PracticeSession key={jutsuId} jutsu={jutsu} modelReady={model.status === 'available'} />;
 }
 
-function PracticeSession({ jutsu }: { jutsu: RosterJutsuDef | null }) {
+function PracticeSession({
+  jutsu,
+  modelReady,
+}: {
+  jutsu: RosterJutsuDef | null;
+  modelReady: boolean;
+}) {
   const settings = useSettings();
-  const fellBackToKeyboard = settings.inputMode === 'webcam' && !isModelAvailable();
+  const fellBackToKeyboard = settings.inputMode === 'webcam' && !modelReady;
   const inputMode = fellBackToKeyboard ? 'keyboard' : settings.inputMode;
 
   const [input] = useState(
@@ -88,6 +114,14 @@ function PracticeSession({ jutsu }: { jutsu: RosterJutsuDef | null }) {
   const { state: camera } = useCamera({ deviceId: settings.cameraDeviceId, enabled: true });
   const stream = camera.status === 'ready' ? camera.stream : null;
   const tracker = useHandTracker(videoRef, stream, camera.status === 'ready');
+
+  // In webcam mode the detector classifies the frames this page's tracker produces.
+  useEffect(() => {
+    const detector = input.detector;
+    if (detector.kind !== 'ml') return;
+    detector.setFrameSource(tracker.subscribe);
+    return () => detector.setFrameSource(null);
+  }, [input, tracker.subscribe]);
 
   const hold = input.getHold(frame.now);
   const progress = input.tracker?.getProgress() ?? 0;
@@ -144,6 +178,13 @@ function PracticeSession({ jutsu }: { jutsu: RosterJutsuDef | null }) {
               confidence={hold.confidence}
               holdFraction={hold.fraction}
               idleText={inputMode === 'keyboard' ? 'Hold a key' : 'No sign'}
+              note={
+                inputMode === 'webcam' && tracker.status !== 'ready'
+                  ? tracker.status === 'error'
+                    ? 'Hand tracking stopped'
+                    : 'Loading hand tracking'
+                  : undefined
+              }
             />
           </VideoPanel>
           {completed && jutsu ? (

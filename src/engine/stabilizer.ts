@@ -5,6 +5,8 @@ export interface SignFrame {
   t: number;
   sign: SignId | 'none';
   confidence: number;
+  /** Full class vector from the classifier, for debug readouts. Absent for the keyboard. */
+  probabilities?: Float32Array;
 }
 
 export interface StabilizerOptions {
