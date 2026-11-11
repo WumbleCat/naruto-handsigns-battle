@@ -41,6 +41,9 @@ describe('buildOutcome', () => {
       opponentHpLeft: 0,
       damageDealt: 24,
       damageTaken: 12,
+      clashesWon: 0,
+      clashesLost: 0,
+      substitutions: 0,
       jutsusUsed: { fire_short: 2 },
     });
   });

@@ -1,0 +1,106 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: var(--space-16);
+  align-items: start;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.word[data-result='win'] {
+  color: var(--text);
+}
+
+.word[data-result='loss'] {
+  color: var(--text-2);
+}
+
+.jutsus {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.jutsuList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.jutsuRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.jutsuName {
+  flex: 1 1 auto;
+  font-size: var(--text-lead);
+}
+
+.jutsuCount {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  border-left: 2px solid var(--border-strong);
+}
+
+.statList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.statList div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.statList dt {
+  color: var(--text-2);
+}
+
+.statList dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.saveStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-small);
+  color: var(--text-muted);
+}
+
+.saveStatus[data-status='saved'] {
+  color: var(--ok);
+}
+
+.saveStatus[data-status='queued'] {
+  color: var(--warn);
+}

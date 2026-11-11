@@ -1,8 +1,11 @@
+import { useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { Button } from '../../components/Button/Button';
 import { TopBar } from '../../components/PageShell/PageShell';
 import { CONTENT } from '../../content/content.config';
 import { useAuth } from '../../features/auth/authContext';
+import { flushMatchQueue } from '../../lib/api/matchQueue';
+import { supabase } from '../../lib/supabase';
 import styles from './layouts.module.css';
 
 const NAV = [
@@ -17,6 +20,12 @@ const NAV = [
 export function AppLayout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  // Retry any match that failed to save last time, once per sign-in.
+  useEffect(() => {
+    if (!supabase || !user || user.id === 'dev-user') return;
+    void flushMatchQueue(supabase, user.id);
+  }, [user]);
 
   const logOut = async () => {
     await signOut();

@@ -6,6 +6,22 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-11
+
+### Added
+
+- OpponentSource contract, seeded PRNG and the three-difficulty bot: paced weaving, misfires,
+  reading the player's opener to counter, Substitution reactions, hard-bot clash timing.
+- BattleController wiring engine, detector, stabiliser, opponent and a pause-aware clock, with
+  tests against a fake detector and a scripted opponent.
+- Pre-battle page: difficulty, input mode, camera check with typed error states, key map.
+- Battle stage: HP bars with damage ghost, timer, flight strip with clash bursts and dodge
+  marks, video panels, Substitution cooldown seal, sign trails with candidate name, countdown,
+  pause and forfeit, result word, live-region announcements.
+- Results page with stats and jutsu used, rematch, change difficulty and back to menu.
+- Match persistence to Supabase with a localStorage retry queue flushed on sign-in.
+- Dev-only local sign-in when Supabase is not configured, so the game can be played offline.
+
 ## [0.3.0] - 2026-11-11
 
 ### Added

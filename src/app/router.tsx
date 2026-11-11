@@ -73,10 +73,12 @@ export const routes: RouteObject[] = [
         children: [
           {
             element: <AppLayout />,
-            children: [{ index: true, element: <PlayPage /> }],
+            children: [
+              { index: true, element: <PlayPage /> },
+              { path: 'results', element: <ResultsPage /> },
+            ],
           },
           { path: 'battle', element: <BattlePage /> },
-          { path: 'results', element: <ResultsPage /> },
         ],
       },
       ...devRoutes,

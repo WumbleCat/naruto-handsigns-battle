@@ -17,6 +17,9 @@ export interface BattleOutcome {
   opponentHpLeft: number;
   damageDealt: number;
   damageTaken: number;
+  clashesWon: number;
+  clashesLost: number;
+  substitutions: number;
   jutsusUsed: Record<string, number>;
 }
 
