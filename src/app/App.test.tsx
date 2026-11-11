@@ -3,18 +3,23 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { ToastProvider } from '../components/Toast/Toast';
 import { CONTENT } from '../content/content.config';
+import { AuthProvider } from '../features/auth/AuthProvider';
 import { App } from './App';
 import { ThemeProvider } from './providers/ThemeProvider';
 
 describe('App', () => {
-  it('renders the game title', () => {
+  it('boots to the landing page with the real providers', async () => {
     render(
       <ThemeProvider>
         <ToastProvider>
-          <App />
+          <AuthProvider>
+            <App />
+          </AuthProvider>
         </ToastProvider>
       </ThemeProvider>,
     );
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(CONTENT.game.title);
+    expect(
+      await screen.findByRole('heading', { level: 1, name: CONTENT.game.tagline }),
+    ).toBeInTheDocument();
   });
 });
