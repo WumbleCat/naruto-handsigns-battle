@@ -15,8 +15,10 @@ asked for a light theme in addition to the dark one. The decisions are recorded 
 `docs/DESIGN.md` section 13 and `docs/FRONTEND_DESIGN.md` sections 3 and 10; everything not
 explicitly decided proceeds with the defaults in `docs/DESIGN.md` section 14.
 
-Next action: merge `docs/design-doc` and `docs/progress-tracker` into `main` with `--no-ff`,
-then start milestone v0.1.0 on `chore/scaffold` (Vite, TypeScript, ESLint, Prettier, Vitest).
+Milestone v0.1.0 is in progress. The tooling scaffold is done and `npm run check` is green.
+
+Next action: `feat/design-tokens` (tokens for both themes, fonts, theme provider, first
+primitives), then `feat/routing-shell`, then `feat/supabase-auth`.
 
 ## Milestone tracker
 
@@ -40,6 +42,9 @@ it matters.
 
 ### 2026-11-11
 
+- `chore/scaffold`: Vite 8, React 19, TypeScript 5.9, ESLint 10 with type-aware rules, Prettier
+  and Vitest 5 are in place and `npm run check` is green. The engine has its own DOM-free
+  type-check config, and its first module defines the sign, element and player identifiers.
 - `docs/progress-tracker`: The owner approved Phase 0. The element tell, the 120 s round timer,
   the Substitution whiff cooldown and instant clash resolution stay as proposed; the visual
   direction is approved with a light theme added. The docs now record the decisions, the

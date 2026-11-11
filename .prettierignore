@@ -1,0 +1,17 @@
+# Build and dependencies
+dist/
+coverage/
+node_modules/
+package-lock.json
+
+# Python tooling
+ml/.venv/
+ml/**/__pycache__/
+
+# Generated or binary assets
+public/models/
+src/lib/database.types.ts
+
+# Hand-formatted prose and SQL
+*.md
+supabase/migrations/
