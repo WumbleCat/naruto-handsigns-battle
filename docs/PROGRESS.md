@@ -39,8 +39,9 @@ match against the hard bot was driven end to end in headless Chrome with no cons
 171 tests pass. Webcam play waits on the recognition model (v0.6.0); live saving waits on the
 owner's Supabase project.
 
-Next action: milestone v0.5.0 on `feat/practice`, `feat/jutsu-book`, `feat/match-history` and
-`feat/settings`.
+Milestone v0.5.0 is in progress: Settings is complete (all sections, synced to Supabase).
+
+Next action: `feat/jutsu-book`, then `feat/practice` and `feat/match-history`.
 
 ## Milestone tracker
 
@@ -51,7 +52,7 @@ Next action: milestone v0.5.0 on `feat/practice`, `feat/jutsu-book`, `feat/match
 | v0.2.0 | Battle engine with full tests | Done | v0.2.0 | 2026-11-11 |
 | v0.3.0 | Webcam, MediaPipe overlay, keyboard detector, recorder route | Done | v0.3.0 | 2026-11-11 |
 | v0.4.0 | Battle page vs bot, results, match saved to Supabase | Done | v0.4.0 | 2026-11-11 |
-| v0.5.0 | Practice, Jutsu Book, Match History, Settings | Not started | | |
+| v0.5.0 | Practice, Jutsu Book, Match History, Settings | In progress | | |
 | v0.6.0 | Training script, ML detector wired in, polish, README, Vercel config | Not started | | |
 | v1.0.0 | Online 1v1: matchmaking, WebRTC video, Realtime signalling, sync, disconnects | Planned | | |
 
@@ -64,6 +65,12 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/settings`: Settings is complete: theme, input mode, camera (device picker that learns
+  names after permission, a test preview, mirror, landmarks, detection threshold), key bindings
+  with conflict refusal and reset, audio levels stored for later, and the account section with
+  username change, availability check and log out. Each section flashes "Saved" on change.
+  Settings now sync with the `user_settings` row: the stored blob wins on sign-in, and every
+  change writes through, debounced.
 - `feat/results-and-persistence`: The results page shows the result word, how the match ended
   and in how long, the jutsu used with counts, damage dealt and taken, HP left, clashes and
   Substitutions, with Rematch, Change difficulty and Back to menu. Finished matches are saved
