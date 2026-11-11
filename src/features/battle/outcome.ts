@@ -17,6 +17,9 @@ export function buildOutcome(state: BattleState, localPlayer: PlayerId): BattleO
     opponentHpLeft: them.hp,
     damageDealt: me.stats.damageDealt,
     damageTaken: me.stats.damageTaken,
+    clashesWon: me.stats.clashesWon,
+    clashesLost: me.stats.clashesLost,
+    substitutions: me.stats.substitutions,
     jutsusUsed: { ...me.stats.jutsusCast },
   };
 }
