@@ -6,6 +6,22 @@
     <meta name="color-scheme" content="dark light" />
     <!-- The visible title is also set at runtime from src/content/content.config.ts. -->
     <title>Jutsu Duel</title>
+    <script>
+      // Apply the cached theme before first paint so the page never flashes the wrong one.
+      // Mirrors src/app/providers/ThemeProvider.tsx; the key matches src/lib/settings/store.ts.
+      (function () {
+        try {
+          var raw = localStorage.getItem('jutsu-duel.settings');
+          var theme = raw ? JSON.parse(raw).theme : null;
+          if (theme !== 'dark' && theme !== 'light') {
+            theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          }
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (error) {
+          /* storage blocked: keep the default dark theme */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
