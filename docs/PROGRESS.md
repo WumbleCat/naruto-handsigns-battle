@@ -32,8 +32,10 @@ detector, and the `/dev/recorder` page that captures labelled landmark samples a
 them. The recorder was driven end to end in headless Chrome with a fake camera: tracking
 reached "ready" and a capture completed with no console errors. 137 tests pass.
 
-Next action: milestone v0.4.0 on `feat/bot-opponent` (OpponentSource and the three-difficulty
-bot), then `feat/battle-page` (controller, HUD, pre-battle camera check) and
+Milestone v0.4.0 is in progress: the OpponentSource contract and the three-difficulty bot are
+done and merged.
+
+Next action: `feat/battle-page` (battle controller, HUD, pre-battle page, battle page), then
 `feat/results-and-persistence`.
 
 ## Milestone tracker
@@ -44,7 +46,7 @@ bot), then `feat/battle-page` (controller, HUD, pre-battle camera check) and
 | v0.1.0 | Scaffold, tooling, design tokens, routing, auth, protected routes | Done | v0.1.0 | 2026-11-11 |
 | v0.2.0 | Battle engine with full tests | Done | v0.2.0 | 2026-11-11 |
 | v0.3.0 | Webcam, MediaPipe overlay, keyboard detector, recorder route | Done | v0.3.0 | 2026-11-11 |
-| v0.4.0 | Battle page vs bot, results, match saved to Supabase | Not started | | |
+| v0.4.0 | Battle page vs bot, results, match saved to Supabase | In progress | | |
 | v0.5.0 | Practice, Jutsu Book, Match History, Settings | Not started | | |
 | v0.6.0 | Training script, ML detector wired in, polish, README, Vercel config | Not started | | |
 | v1.0.0 | Online 1v1: matchmaking, WebRTC video, Realtime signalling, sync, disconnects | Planned | | |
@@ -58,6 +60,12 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/bot-opponent`: The OpponentSource contract and the bot behind it. Three difficulties
+  from the balance table: sign pace with jitter, think time, long-jutsu preference, misfires
+  that reset its own buffer, reading the player's opener to counter with the advantaged
+  element, Substitution reactions that respect its cooldown, and the hard bot's clash timing.
+  All randomness comes from a seeded PRNG, so a match replays from its seed; tests drive the
+  bot against the real engine.
 - `feat/camera-mediapipe`: The detection layer (one branch instead of the three planned, since
   the pieces share one contract). Camera service with permission, not-found, in-use and
   unplugged errors; MediaPipe hand tracking loaded on demand with GPU then CPU fallback and a
