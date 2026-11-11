@@ -1,6 +1,7 @@
 // Keyboard sign detector (docs/DESIGN.md 7.5): twelve keys map to the twelve signs. While a
 // key is held it emits that sign at confidence 1.0 every animation frame, otherwise 'none',
 // so the stabiliser applies the same hold time as the webcam and the engine sees identical input.
+// On-screen sign buttons use the same detector through hold() and release().
 import type { SignId } from '../engine/types';
 import type { DetectorError, DetectorStatus, SignDetector, SignFrame, Unsubscribe } from './types';
 
@@ -11,7 +12,13 @@ export interface KeyboardSignDetectorOptions {
   target?: EventTarget;
   /** Clock; defaults to performance.now. */
   now?: () => number;
+  /** Frame scheduler; defaults to requestAnimationFrame. Tests pass null and call tick(). */
+  schedule?: ((callback: () => void) => number) | null;
+  cancel?: (handle: number) => void;
 }
+
+/** Something currently held: a physical key (by code) or an on-screen sign button. */
+type Held = { source: 'key'; code: string } | { source: 'pad'; sign: SignId };
 
 const EDITABLE_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
 
@@ -28,9 +35,11 @@ export class KeyboardSignDetector implements SignDetector {
   private codeToSign = new Map<string, SignId>();
   private readonly target: EventTarget;
   private readonly now: () => number;
-  /** Held codes in press order; the most recent wins when several are down. */
-  private held: string[] = [];
-  private rafId = 0;
+  private readonly schedule: ((callback: () => void) => number) | null;
+  private readonly cancel: (handle: number) => void;
+  /** Everything held, in press order; the most recent wins when several are down. */
+  private held: Held[] = [];
+  private frameHandle = 0;
   private readonly frameListeners = new Set<(frame: SignFrame) => void>();
   private readonly statusListeners = new Set<(status: DetectorStatus) => void>();
 
@@ -38,13 +47,30 @@ export class KeyboardSignDetector implements SignDetector {
     this.setBindings(options.bindings);
     this.target = options.target ?? window;
     this.now = options.now ?? (() => performance.now());
+    this.schedule =
+      options.schedule === undefined
+        ? (callback) => requestAnimationFrame(callback)
+        : options.schedule;
+    this.cancel = options.cancel ?? ((handle) => cancelAnimationFrame(handle));
   }
 
   setBindings(bindings: Record<SignId, string>): void {
     this.codeToSign = new Map(
       (Object.entries(bindings) as Array<[SignId, string]>).map(([sign, code]) => [code, sign]),
     );
-    this.held = this.held.filter((code) => this.codeToSign.has(code));
+    this.held = this.held.filter((h) => h.source === 'pad' || this.codeToSign.has(h.code));
+  }
+
+  /** Start holding a sign from an on-screen button. Idempotent until release(). */
+  hold(sign: SignId): void {
+    this.held = [
+      ...this.held.filter((h) => !(h.source === 'pad' && h.sign === sign)),
+      { source: 'pad', sign },
+    ];
+  }
+
+  release(sign: SignId): void {
+    this.held = this.held.filter((h) => !(h.source === 'pad' && h.sign === sign));
   }
 
   onFrame(listener: (frame: SignFrame) => void): Unsubscribe {
@@ -71,8 +97,8 @@ export class KeyboardSignDetector implements SignDetector {
     this.target.removeEventListener('keydown', this.onKeyDown);
     this.target.removeEventListener('keyup', this.onKeyUp);
     this.target.removeEventListener('blur', this.onBlur);
-    if (this.rafId) cancelAnimationFrame(this.rafId);
-    this.rafId = 0;
+    if (this.frameHandle) this.cancel(this.frameHandle);
+    this.frameHandle = 0;
     this.held = [];
     this.setStatus('idle');
   }
@@ -80,10 +106,18 @@ export class KeyboardSignDetector implements SignDetector {
   /** The frame for the current key state. Public so tests and the loop share one path. */
   sample(t = this.now()): SignFrame {
     for (let i = this.held.length - 1; i >= 0; i -= 1) {
-      const sign = this.codeToSign.get(this.held[i] as string);
+      const held = this.held[i];
+      if (!held) continue;
+      const sign = held.source === 'pad' ? held.sign : this.codeToSign.get(held.code);
       if (sign) return { t, sign, confidence: 1 };
     }
     return { t, sign: 'none', confidence: 0 };
+  }
+
+  /** Emit one frame to the listeners. The animation loop calls this; tests call it directly. */
+  tick(): void {
+    const frame = this.sample();
+    for (const listener of this.frameListeners) listener(frame);
   }
 
   /** The sign currently held, for the keyboard hint in the HUD. */
@@ -97,12 +131,15 @@ export class KeyboardSignDetector implements SignDetector {
     if (isEditable(event.target) || event.ctrlKey || event.metaKey || event.altKey) return;
     if (!this.codeToSign.has(event.code)) return;
     event.preventDefault();
-    this.held = [...this.held.filter((code) => code !== event.code), event.code];
+    this.held = [
+      ...this.held.filter((h) => h.source === 'pad' || h.code !== event.code),
+      { source: 'key', code: event.code },
+    ];
   };
 
   private onKeyUp = (event: Event): void => {
     if (!(event instanceof KeyboardEvent)) return;
-    this.held = this.held.filter((code) => code !== event.code);
+    this.held = this.held.filter((h) => h.source === 'pad' || h.code !== event.code);
   };
 
   private onBlur = (): void => {
@@ -110,9 +147,8 @@ export class KeyboardSignDetector implements SignDetector {
   };
 
   private loop = (): void => {
-    const frame = this.sample();
-    for (const listener of this.frameListeners) listener(frame);
-    this.rafId = requestAnimationFrame(this.loop);
+    this.tick();
+    if (this.schedule) this.frameHandle = this.schedule(this.loop);
   };
 
   private setStatus(status: DetectorStatus): void {

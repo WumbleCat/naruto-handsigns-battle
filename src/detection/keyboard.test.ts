@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { DEFAULT_KEY_BINDINGS } from '../lib/settings/schema';
 import { KeyboardSignDetector } from './keyboard';
+import type { SignFrame } from './types';
 
 function key(type: 'keydown' | 'keyup', code: string, init: KeyboardEventInit = {}) {
   window.dispatchEvent(new KeyboardEvent(type, { code, bubbles: true, ...init }));
@@ -84,5 +85,37 @@ describe('KeyboardSignDetector', () => {
     key('keydown', 'KeyE');
     expect(detector.sample().sign).toBe('none');
     expect(detector.status).toBe('idle');
+  });
+
+  it('holds and releases signs from on-screen buttons alongside keys', async () => {
+    detector = new KeyboardSignDetector({ bindings: DEFAULT_KEY_BINDINGS, schedule: null });
+    await detector.start();
+    detector.hold('tiger');
+    expect(detector.sample().sign).toBe('tiger');
+    key('keydown', 'KeyD');
+    expect(detector.sample().sign).toBe('horse');
+    key('keyup', 'KeyD');
+    expect(detector.sample().sign).toBe('tiger');
+    detector.hold('tiger');
+    detector.release('tiger');
+    expect(detector.sample().sign).toBe('none');
+    detector.hold('rat');
+    detector.setBindings({ ...DEFAULT_KEY_BINDINGS, rat: 'KeyT' });
+    expect(detector.sample().sign).toBe('rat');
+  });
+
+  it('emits a frame to listeners on each tick when no scheduler is given', async () => {
+    detector = new KeyboardSignDetector({
+      bindings: DEFAULT_KEY_BINDINGS,
+      schedule: null,
+      now: () => 9,
+    });
+    const frames: SignFrame[] = [];
+    detector.onFrame((frame) => frames.push(frame));
+    await detector.start();
+    expect(frames).toEqual([{ t: 9, sign: 'none', confidence: 0 }]);
+    detector.hold('rat');
+    detector.tick();
+    expect(frames.at(-1)).toEqual({ t: 9, sign: 'rat', confidence: 1 });
   });
 });
