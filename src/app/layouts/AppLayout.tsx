@@ -4,6 +4,7 @@ import { Button } from '../../components/Button/Button';
 import { TopBar } from '../../components/PageShell/PageShell';
 import { CONTENT } from '../../content/content.config';
 import { useAuth } from '../../features/auth/authContext';
+import { useSettingsSync } from '../../features/settings/useSettingsSync';
 import { flushMatchQueue } from '../../lib/api/matchQueue';
 import { supabase } from '../../lib/supabase';
 import styles from './layouts.module.css';
@@ -20,6 +21,7 @@ const NAV = [
 export function AppLayout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  useSettingsSync();
 
   // Retry any match that failed to save last time, once per sign-in.
   useEffect(() => {

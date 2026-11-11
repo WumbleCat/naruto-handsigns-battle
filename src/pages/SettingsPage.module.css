@@ -22,8 +22,38 @@
   color: var(--text-muted);
 }
 
+.saved {
+  min-height: 1.4em;
+  font-size: var(--text-small);
+  color: var(--ok);
+  opacity: 0;
+  transition: opacity var(--dur-base);
+}
+
+.saved[data-visible] {
+  opacity: 1;
+}
+
 .sectionBody {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+}
+
+.bindings {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3) var(--space-6);
+}
+
+.bindingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.bindingName {
+  flex: 1 1 auto;
+  font-weight: 500;
 }
