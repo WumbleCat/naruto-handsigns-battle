@@ -45,6 +45,23 @@ export interface MatchPage {
   hasMore: boolean;
 }
 
+export interface MatchCounts {
+  total: number;
+  wins: number;
+}
+
+/** Totals for the summary line, without fetching rows. */
+export async function countMatches(client: AppSupabaseClient): Promise<MatchCounts> {
+  const total = await client.from('matches').select('id', { count: 'exact', head: true });
+  if (total.error) throw new MatchSaveError(total.error.message, { cause: total.error });
+  const wins = await client
+    .from('matches')
+    .select('id', { count: 'exact', head: true })
+    .eq('result', 'win');
+  if (wins.error) throw new MatchSaveError(wins.error.message, { cause: wins.error });
+  return { total: total.count ?? 0, wins: wins.count ?? 0 };
+}
+
 export interface ListMatchesOptions {
   limit?: number;
   /** Fetch rows created before this ISO timestamp (cursor). */
