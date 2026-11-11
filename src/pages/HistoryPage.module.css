@@ -1,0 +1,79 @@
+.filters {
+  display: flex;
+  gap: var(--space-4);
+  max-width: 480px;
+}
+
+.filters > * {
+  flex: 1 1 0;
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3) var(--space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table th {
+  font-size: var(--text-small);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.number {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.result {
+  font-weight: 700;
+}
+
+.result[data-result='win'] {
+  color: var(--ok);
+}
+
+.result[data-result='loss'] {
+  color: var(--danger);
+}
+
+.reason {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.jutsus {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.jutsu {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.count,
+.more {
+  font-size: var(--text-small);
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
