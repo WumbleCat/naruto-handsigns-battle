@@ -1,0 +1,157 @@
+/*
+ * Design tokens. Source of truth: docs/FRONTEND_DESIGN.md section 3.
+ * Components use the semantic tokens (--bg, --surface, --text, --action, element tokens),
+ * never the ink/paper primitives, so the light theme is a token swap.
+ */
+
+:root {
+  /* ink scale (dark theme ground) */
+  --ink-950: #0c1627;
+  --ink-900: #111f36;
+  --ink-800: #182a47;
+  --ink-700: #22365a;
+  --ink-600: #31487a;
+  --ink-500: #4a628f;
+  --ink-400: #7d8fb3;
+  --ink-200: #c5cee0;
+
+  /* paper scale (light theme ground, dark theme actions) */
+  --paper-50: #fbf8f2;
+  --paper-100: #f4efe4;
+  --paper-200: #eae2d3;
+  --paper-300: #d9cfbb;
+  --paper-400: #bfb29a;
+
+  /* type */
+  --font-display: 'Yuji Syuku', 'Hiragino Mincho ProN', Georgia, serif;
+  --font-text: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Segoe UI', system-ui, sans-serif;
+  --text-display-xl: 76px;
+  --text-display-lg: 61px;
+  --text-display-md: 49px;
+  --text-display-sm: 31px;
+  --text-heading: 25px;
+  --text-lead: 20px;
+  --text-body: 16px;
+  --text-small: 13px;
+  --text-hud-lg: 31px;
+  --text-hud-md: 25px;
+
+  /* space (4 px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* radius: two tiers encode hierarchy. Rectangles are soft; seals are round. */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-full: 999px;
+
+  /* motion */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --dur-ghost: 600ms;
+  --dur-flight: 1500ms; /* overwritten at runtime from balance.config */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-stamp: cubic-bezier(0.6, 0, 0.9, 0.35);
+
+  /* layers */
+  --z-panel: 10;
+  --z-hud: 20;
+  --z-overlay: 30;
+  --z-dialog: 40;
+  --z-toast: 50;
+  --z-notice: 60;
+
+  /* layout */
+  --page-max: 1120px;
+  --page-max-wide: 1216px;
+  --stage-max: 1600px;
+  --gutter: 32px;
+}
+
+/* Semantic tokens: dark theme (default) */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: var(--ink-900);
+  --bg-stage: var(--ink-950);
+  --surface: var(--ink-800);
+  --surface-2: var(--ink-700);
+  --border: var(--ink-700);
+  --border-strong: var(--ink-600);
+  --text: var(--paper-100);
+  --text-2: var(--ink-200);
+  --text-muted: var(--ink-400);
+  --action: var(--paper-100);
+  --action-hover: var(--paper-200);
+  --action-text: var(--ink-900);
+  --focus: var(--paper-100);
+  --hp-fill: var(--paper-100);
+  --scrim: rgb(12 22 39 / 0.72);
+  --fire: #ff5a3c;
+  --wind: #7ed9a3;
+  --lightning: #f5e663;
+  --earth: #c98a4b;
+  --water: #5eb8f5;
+  --substitution: #b9a7e8;
+  --danger: #ff6b8a;
+  --ok: #8be0b0;
+  --warn: #f5c663;
+}
+
+/* Semantic tokens: light theme */
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: var(--paper-100);
+  --bg-stage: var(--paper-200);
+  --surface: var(--paper-50);
+  --surface-2: var(--paper-200);
+  --border: var(--paper-300);
+  --border-strong: var(--paper-400);
+  --text: var(--ink-900);
+  --text-2: var(--ink-700);
+  --text-muted: var(--ink-500);
+  --action: var(--ink-900);
+  --action-hover: var(--ink-700);
+  --action-text: var(--paper-100);
+  --focus: var(--ink-900);
+  --hp-fill: var(--ink-900);
+  --scrim: rgb(17 31 54 / 0.45);
+  --fire: #c4341c;
+  --wind: #1e7a4b;
+  --lightning: #7a5f00;
+  --earth: #8a4e1c;
+  --water: #1562a8;
+  --substitution: #5b44a8;
+  --danger: #b5174e;
+  --ok: #1f7f5c;
+  --warn: #8a5a00;
+}
+
+/* Element colour is applied through data-element so one stylesheet serves every element. */
+[data-element='fire'] {
+  --element-color: var(--fire);
+}
+[data-element='wind'] {
+  --element-color: var(--wind);
+}
+[data-element='lightning'] {
+  --element-color: var(--lightning);
+}
+[data-element='earth'] {
+  --element-color: var(--earth);
+}
+[data-element='water'] {
+  --element-color: var(--water);
+}
+[data-element='substitution'] {
+  --element-color: var(--substitution);
+}
