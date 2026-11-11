@@ -11,6 +11,7 @@ import { CONTENT } from '../content/content.config';
 import { isRosterJutsuId, ROSTER } from '../content/roster';
 import type { ThemedElement } from '../content/types';
 import { createSignDetector } from '../detection/createDetector';
+import { useModelState } from '../detection/model';
 import { SequenceMatcher } from '../engine/sequence';
 import type { SignId } from '../engine/types';
 import { BattleController } from '../features/battle/BattleController';
@@ -65,7 +66,13 @@ function candidateName(buffer: readonly SignId[]): string | null {
 
 export function BattlePage() {
   const session = useBattleSession();
+  const model = useModelState();
   if (!session.setup) return <Navigate to="/play" replace />;
+  // Webcam play needs the recognition model; the pre-battle page only lets the player start
+  // once it has loaded, so this covers a reload or a direct link.
+  if (session.setup.inputMode === 'webcam' && model.status !== 'available') {
+    return <Navigate to="/play" replace />;
+  }
   return <BattleStage setup={session.setup} />;
 }
 
@@ -131,6 +138,14 @@ function BattleStage({
   const { state: camera } = useCamera({ deviceId: settings.cameraDeviceId, enabled: true });
   const stream = camera.status === 'ready' ? camera.stream : null;
   const tracker = useHandTracker(videoRef, stream, camera.status === 'ready');
+
+  // In webcam mode the detector classifies the frames this page's tracker produces.
+  useEffect(() => {
+    const detector = controller.detector;
+    if (detector.kind !== 'ml') return;
+    detector.setFrameSource(tracker.subscribe);
+    return () => detector.setFrameSource(null);
+  }, [controller, tracker.subscribe]);
 
   // Transient effects from engine events.
   useEngineEvent(controller, 'hit', (event) => {
@@ -277,6 +292,13 @@ function BattleStage({
             confidence={hold.confidence}
             holdFraction={hold.fraction}
             idleText={setup.inputMode === 'keyboard' ? 'Hold a key' : 'No sign'}
+            note={
+              setup.inputMode === 'webcam' && started && tracker.status !== 'ready'
+                ? tracker.status === 'error'
+                  ? 'Hand tracking stopped'
+                  : 'Loading hand tracking'
+                : undefined
+            }
           />
         </VideoPanel>
 

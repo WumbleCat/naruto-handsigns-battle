@@ -1,5 +1,5 @@
 // Dev-only training data recorder (docs/DESIGN.md 7.6, docs/FRONTEND_DESIGN.md 6.13).
-import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { Link } from 'react-router';
 import { Button } from '../../components/Button/Button';
 import { Dialog } from '../../components/Dialog/Dialog';
@@ -9,7 +9,10 @@ import { Select } from '../../components/Select/Select';
 import { TextField } from '../../components/TextField/TextField';
 import { useToast } from '../../components/Toast/toastContext';
 import { VideoPanel, type VideoPanelState } from '../../components/VideoPanel/VideoPanel';
+import { BALANCE } from '../../content/balance.config';
 import { CONTENT } from '../../content/content.config';
+import { MlSignDetector } from '../../detection/ml';
+import { useModelState } from '../../detection/model';
 import type { LandmarkFrame } from '../../detection/types';
 import { SIGN_IDS, type SignId } from '../../engine/types';
 import { useCamera } from '../../features/camera/useCamera';
@@ -53,6 +56,56 @@ function cameraPanelState(status: string, trackerStatus: string): VideoPanelStat
   return 'loading';
 }
 
+interface Prediction {
+  label: SampleLabel;
+  /** Rounded to 5% steps so the readout does not re-render on every frame. */
+  confidence: number;
+}
+
+/** What the installed classifier says about the live frames, for checking a model by eye. */
+function useLivePrediction(subscribe: (listener: (frame: LandmarkFrame) => void) => () => void) {
+  const model = useModelState();
+  const classifier = model.status === 'available' ? model.classifier : null;
+  const detector = useMemo(
+    () =>
+      classifier
+        ? new MlSignDetector({ classifier, smoothingAlpha: BALANCE.smoothingAlpha })
+        : null,
+    [classifier],
+  );
+  const [prediction, setPrediction] = useState<Prediction | null>(null);
+
+  useEffect(() => {
+    if (!detector) return;
+    const off = detector.onFrame((frame) => {
+      const next: Prediction = {
+        label: frame.sign,
+        confidence: Math.round(frame.confidence * 20) / 20,
+      };
+      setPrediction((current) =>
+        current && current.label === next.label && current.confidence === next.confidence
+          ? current
+          : next,
+      );
+    });
+    detector.setFrameSource(subscribe);
+    void detector.start();
+    return () => {
+      off();
+      detector.stop();
+    };
+  }, [detector, subscribe]);
+
+  if (model.status === 'available') {
+    if (!prediction) return 'waiting for frames';
+    const name = prediction.label === 'none' ? 'none' : CONTENT.signs[prediction.label].name;
+    return `${name} ${prediction.confidence.toFixed(2)}`;
+  }
+  if (model.status === 'missing') return 'no model installed';
+  if (model.status === 'error') return `failed to load (${model.message})`;
+  return 'loading';
+}
+
 export function RecorderPage() {
   const settings = useSettings();
   const toast = useToast();
@@ -60,6 +113,7 @@ export function RecorderPage() {
   const { state: camera, retry } = useCamera({ deviceId: settings.cameraDeviceId, enabled: true });
   const stream = camera.status === 'ready' ? camera.stream : null;
   const tracker = useHandTracker(videoRef, stream, true);
+  const classifierText = useLivePrediction(tracker.subscribe);
 
   const [label, setLabel] = useState<SampleLabel>('tiger');
   const [perCapture, setPerCapture] = useState(100);
@@ -236,7 +290,7 @@ export function RecorderPage() {
               </div>
               <div>
                 <dt>Classifier</dt>
-                <dd>none loaded (v0.6.0)</dd>
+                <dd>{classifierText}</dd>
               </div>
             </dl>
           </div>

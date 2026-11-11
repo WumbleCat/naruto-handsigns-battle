@@ -1,20 +1,27 @@
 // Pre-battle: difficulty, input mode and the camera check (docs/FRONTEND_DESIGN.md 6.4).
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Button } from '../components/Button/Button';
 import { LinkButton } from '../components/Button/LinkButton';
+import { DetectionReadout } from '../components/DetectionReadout/DetectionReadout';
 import { PageShell } from '../components/PageShell/PageShell';
 import { SegmentedControl } from '../components/SegmentedControl/SegmentedControl';
 import { Spinner } from '../components/Spinner/Spinner';
 import { VideoPanel } from '../components/VideoPanel/VideoPanel';
+import { BALANCE } from '../content/balance.config';
 import { CONTENT } from '../content/content.config';
 import { BOT_DIFFICULTIES, type BotDifficulty } from '../content/types';
-import { isModelAvailable } from '../detection/createDetector';
+import { NO_MODEL_MESSAGE } from '../detection/createDetector';
+import { MlSignDetector } from '../detection/ml';
+import { modelStore, useModelState } from '../detection/model';
+import type { SignId } from '../engine/types';
 import { useBattleSession } from '../features/battle/battleSessionContext';
+import { useFrameTick } from '../features/battle/hooks';
 import { BotAvatar } from '../features/battle/hud/BotAvatar';
 import { KeyMap } from '../features/battle/KeyMap';
 import { useCamera } from '../features/camera/useCamera';
 import { useHandTracker } from '../features/camera/useHandTracker';
+import { PracticeInput } from '../features/practice/PracticeInput';
 import { INPUT_MODES, type InputMode } from '../lib/settings/schema';
 import { settingsStore, useSettings } from '../lib/settings/store';
 import styles from './PlayPage.module.css';
@@ -23,6 +30,9 @@ const INPUT_OPTIONS: readonly { value: InputMode; label: string }[] = INPUT_MODE
   value,
   label: value === 'webcam' ? 'Webcam' : 'Keyboard',
 }));
+
+/** The sign the player holds to prove the whole pipeline before a fight. */
+const CONFIRM_SIGN: SignId = 'ram';
 
 type CheckState = 'pending' | 'ok' | 'warn' | 'error';
 
@@ -43,12 +53,16 @@ export function PlayPage() {
   const settings = useSettings();
   const session = useBattleSession();
   const navigate = useNavigate();
+  const model = useModelState();
   const [difficulty, setDifficulty] = useState<BotDifficulty>(
     session.setup?.difficulty ?? 'medium',
   );
   const inputMode = settings.inputMode;
   const webcam = inputMode === 'webcam';
-  const modelAvailable = isModelAvailable();
+
+  useEffect(() => {
+    if (model.status === 'unknown') void modelStore.load();
+  }, [model.status]);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const attachVideo = useCallback((element: HTMLVideoElement | null) => {
@@ -61,17 +75,65 @@ export function PlayPage() {
   const stream = camera.status === 'ready' ? camera.stream : null;
   const tracker = useHandTracker(videoRef, stream, webcam);
 
+  // The confirmation check runs the real detector and stabiliser on the preview, so a
+  // registered Ram sign means the camera, tracking, model and hold rule all work together.
+  const classifier = model.status === 'available' ? model.classifier : null;
+  const confirm = useMemo(
+    () =>
+      classifier
+        ? new PracticeInput({
+            detector: new MlSignDetector({ classifier, smoothingAlpha: BALANCE.smoothingAlpha }),
+            tracker: null,
+            holdMs: BALANCE.signHoldMs,
+            threshold: settings.confidenceThreshold,
+          })
+        : null,
+    [classifier, settings.confidenceThreshold],
+  );
+  const [confirmed, setConfirmed] = useState(false);
+  const confirming = webcam && confirm !== null && tracker.status === 'ready';
+
+  useEffect(() => {
+    if (!confirming) return;
+    const off = confirm.onEvent((event) => {
+      if (event.type === 'registered' && event.sign === CONFIRM_SIGN) setConfirmed(true);
+    });
+    confirm.detector.setFrameSource(tracker.subscribe);
+    confirm.start().catch(() => undefined);
+    return () => {
+      off();
+      confirm.stop();
+      confirm.detector.setFrameSource(null);
+    };
+  }, [confirming, confirm, tracker.subscribe]);
+
+  const clock = useFrameTick(confirming);
+  const hold = confirming ? confirm.getHold(clock.now) : null;
+
   const cameraCheck: CheckState =
     camera.status === 'ready' ? 'ok' : camera.status === 'error' ? 'error' : 'pending';
   const trackingCheck: CheckState =
-    tracker.status === 'ready'
-      ? 'ok'
-      : tracker.status === 'error'
-        ? 'error'
-        : camera.status === 'ready'
-          ? 'pending'
+    tracker.status === 'ready' ? 'ok' : tracker.status === 'error' ? 'error' : 'pending';
+  const modelCheck: CheckState =
+    model.status === 'available'
+      ? confirmed
+        ? 'ok'
+        : 'pending'
+      : model.status === 'missing'
+        ? 'warn'
+        : model.status === 'error'
+          ? 'error'
           : 'pending';
-  const modelCheck: CheckState = modelAvailable ? 'ok' : 'warn';
+  const modelText =
+    model.status === 'available'
+      ? confirmed
+        ? `${CONTENT.signs[CONFIRM_SIGN].name} sign recognised`
+        : `Hold the ${CONTENT.signs[CONFIRM_SIGN].name} sign to confirm`
+      : model.status === 'missing'
+        ? NO_MODEL_MESSAGE
+        : model.status === 'error'
+          ? `The recognition model could not load. ${model.message}`
+          : 'Loading the recognition model';
 
   const canStart =
     inputMode === 'keyboard' ||
@@ -149,13 +211,13 @@ export function PlayPage() {
                 {camera.status === 'ready' ? 'Camera on' : 'Waiting for the camera'}
               </Check>
               <Check state={trackingCheck}>
-                {tracker.status === 'ready' ? 'Hand tracking loaded' : 'Loading hand tracking'}
+                {tracker.status === 'ready'
+                  ? 'Hand tracking loaded'
+                  : tracker.status === 'error'
+                    ? 'Hand tracking could not load'
+                    : 'Loading hand tracking'}
               </Check>
-              <Check state={modelCheck}>
-                {modelAvailable
-                  ? 'Recognition model ready'
-                  : 'No recognition model is installed yet. Keyboard mode is available.'}
-              </Check>
+              <Check state={modelCheck}>{modelText}</Check>
             </ul>
             <p className="t-small t-muted">
               Change camera in{' '}
@@ -195,7 +257,16 @@ export function PlayPage() {
                     }
                   : undefined
               }
-            />
+            >
+              {hold ? (
+                <DetectionReadout
+                  sign={hold.sign}
+                  confidence={hold.confidence}
+                  holdFraction={hold.fraction}
+                  idleText="No sign"
+                />
+              ) : null}
+            </VideoPanel>
           </div>
         </section>
       ) : (

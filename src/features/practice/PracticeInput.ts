@@ -8,17 +8,18 @@ import type { PracticeEvent, PracticeTracker } from './PracticeTracker';
 
 export type PracticeInputEvent = PracticeEvent | { type: 'registered'; sign: SignId };
 
-export interface PracticeInputOptions {
-  detector: SignDetector;
+export interface PracticeInputOptions<D extends SignDetector = SignDetector> {
+  detector: D;
   tracker: PracticeTracker | null;
   holdMs: number;
   threshold: number;
   now?: () => number;
 }
 
-export class PracticeInput {
+export class PracticeInput<D extends SignDetector = SignDetector> {
   readonly tracker: PracticeTracker | null;
-  private readonly detector: SignDetector;
+  /** Public so the page can hand a webcam detector its landmark frames. */
+  readonly detector: D;
   private readonly stabilizer: SignStabilizer;
   private readonly now: () => number;
   private lastFrame: SignFrame | null = null;
@@ -26,7 +27,7 @@ export class PracticeInput {
   private off: (() => void) | null = null;
   private readonly listeners = new Set<(event: PracticeInputEvent) => void>();
 
-  constructor(options: PracticeInputOptions) {
+  constructor(options: PracticeInputOptions<D>) {
     this.detector = options.detector;
     this.tracker = options.tracker;
     this.stabilizer = new SignStabilizer({ holdMs: options.holdMs, threshold: options.threshold });
