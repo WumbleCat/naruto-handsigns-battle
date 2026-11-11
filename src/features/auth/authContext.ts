@@ -14,6 +14,7 @@ export type AuthErrorCode =
   | 'username-taken'
   | 'username-invalid'
   | 'weak-password'
+  | 'email-not-confirmed'
   | 'not-configured'
   | 'network'
   | 'unknown';

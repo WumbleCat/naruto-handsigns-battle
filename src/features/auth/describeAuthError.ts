@@ -14,6 +14,8 @@ export function describeAuthError(error: unknown): string {
         return '3 to 20 characters: lower-case letters, numbers and underscore.';
       case 'weak-password':
         return `Use at least ${PASSWORD_MIN_LENGTH} characters.`;
+      case 'email-not-confirmed':
+        return 'Confirm your email first. Check your inbox for the link.';
       case 'network':
         return "You're offline. Try again when you're connected.";
       case 'not-configured':
