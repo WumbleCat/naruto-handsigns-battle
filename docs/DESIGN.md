@@ -1,6 +1,7 @@
 # Jutsu Duel: Design Document
 
-Working title: **Jutsu Duel**. Status: Phase 0 proposal, awaiting approval.
+Working title: **Jutsu Duel**. Status: approved by the owner on 2026-11-11 (decisions in
+section 13); implementation in progress.
 Companion documents: `docs/FRONTEND_DESIGN.md` (visual and UI spec) and `CLAUDE.md` (conventions).
 
 Code uses neutral identifiers everywhere (`fire_short`, `substitution`, `tiger`). Every themed,
@@ -130,7 +131,7 @@ players act concurrently.
 - A player whose HP reaches 0 or below loses immediately (`ko`).
 - If both players reach 0 in the same clash, the match is a draw.
 - A round lasts `roundDurationMs` = 120 000 ms. When time runs out, the player with more HP wins;
-  equal HP is a draw. (Proposed as a safety net; see open questions.)
+  equal HP is a draw.
 
 ### 5.2 Elements
 
@@ -184,7 +185,7 @@ Each player has a buffer of registered signs.
   number (6, 9, 13, 18 at 0.5x; 18, 27, 39, 54 at 1.5x).
 - Resolving at the moment of the second cast (rather than when the first would have landed)
   keeps the rule simple, removes the possibility of both players having projectiles in flight at
-  once, and gives a clean "clash" moment for effects. See open questions.
+  once, and gives a clean "clash" moment for effects.
 - A player can have more than one projectile in flight only with very fast input (three keyboard
   signs in under 1.5 s); the engine handles a list, so nothing breaks.
 
@@ -196,7 +197,6 @@ Each player has a buffer of registered signs.
   cooldown does nothing except reset the buffer (`substitutionFailed` with reason `cooldown`).
 - Completing it with nothing in flight ("whiff") also starts the cooldown
   (`substitutionWhiffTriggersCooldown` = true), so it cannot be spammed as a permanent shield.
-  See open questions.
 
 ### 5.6 Balance config
 
@@ -775,6 +775,7 @@ select policy added with the online migration, not a v1 change.
 ```ts
 {
   version: 1,
+  theme: 'system' | 'dark' | 'light',       // default 'system'; applied before first paint
   inputMode: 'webcam' | 'keyboard',          // default 'webcam'
   cameraDeviceId: string | null,
   mirrorVideo: boolean,                      // default true
@@ -893,7 +894,7 @@ sequenceDiagram
   replaces the app; 1024–1279 px shows a dismissible banner that the layout is best at 1280+.
 - **Accessibility**: every interactive element keyboard reachable with a visible focus ring;
   element is never conveyed by colour alone (glyph and name accompany it); text contrast meets
-  WCAG AA; `prefers-reduced-motion` disables flight animation and flashes in favour of static
+  WCAG AA in both the dark and the light theme; `prefers-reduced-motion` disables flight animation and flashes in favour of static
   indicators; live regions announce hits and match end.
 - **Privacy**: webcam frames are processed on the device and never uploaded in v1. Recordings
   store landmark coordinates only. Online 1v1 streams video peer to peer, not through a server.
@@ -921,7 +922,19 @@ Each milestone merges one or more branches into `main` with `--no-ff`, then tags
 
 ---
 
-## 13. Open questions
+## 13. Decisions and open questions
+
+Decided by the owner on 2026-11-11:
+
+- **Element tell**: kept. One unique opener sign per element (section 6.1).
+- **Round timer**: kept. 120 s cap; more HP wins at timeout, equal HP draws (section 5.1).
+- **Substitution whiff**: kept. Completing Substitution with nothing in flight starts the 8 s
+  cooldown (section 5.5).
+- **Clash timing**: kept. A clash resolves the instant the second jutsu casts (section 5.4).
+- **Visual direction**: approved in full, with a light theme added (`docs/FRONTEND_DESIGN.md`
+  sections 3.3, 3.4 and 10). Settings gains a Theme control; the settings schema gains `theme`.
+- Everything else below proceeds with the defaults listed in section 14 unless the owner says
+  otherwise. The list is kept for reference.
 
 1. **Roster**: approve the sequences, lengths (Fire 3/6, Wind 3/5, Lightning 4/6, Earth 4/5,
    Water 3/6) and themed names in section 6, or request changes.
@@ -984,7 +997,8 @@ Where this document had to choose, it chose as follows. Each stands unless you s
 - Settings are stored as one versioned jsonb blob validated by zod on the client.
 - `npm` manages the web app; `uv` manages `/ml`. No GitHub remote yet; merges are local with
   `--no-ff`.
-- Single visual theme (dark indigo); no light mode in v1.
+- Two themes: dark (default) and light, following the system preference unless the player picks
+  one in Settings. Both are token swaps over one design.
 - Supabase email confirmation state is handled in the UI either way.
 - Chrome/Edge are the primary targets; MediaPipe assets load from the jsDelivr CDN unless
   `VITE_MEDIAPIPE_WASM_URL` is set.
