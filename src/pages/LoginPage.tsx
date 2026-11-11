@@ -64,6 +64,17 @@ export function LoginPage() {
         <p className={styles.alt}>
           New here? <Link to="/signup">Create an account</Link>
         </p>
+        {auth.devSignIn ? (
+          <Button
+            variant="ghost"
+            onClick={() => {
+              auth.devSignIn?.();
+              void navigate(safeReturnTo(location.search), { replace: true });
+            }}
+          >
+            Continue as dev user (no Supabase configured)
+          </Button>
+        ) : null}
       </form>
     </PageShell>
   );

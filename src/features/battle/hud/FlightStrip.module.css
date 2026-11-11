@@ -1,0 +1,112 @@
+.strip {
+  position: relative;
+  height: 64px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.projectile {
+  position: absolute;
+  top: 8px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  will-change: left;
+}
+
+.projectile[data-from='right'] {
+  flex-direction: row-reverse;
+}
+
+.name {
+  white-space: nowrap;
+  font-size: var(--text-lead);
+}
+
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 3px;
+  background: var(--surface-2);
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  background: var(--text-2);
+}
+
+.burst {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  transform: translateX(-50%);
+  animation: burst 800ms var(--ease-out) forwards;
+}
+
+.burstCore {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  border: 3px solid var(--text);
+  animation: grow 300ms var(--ease-out) forwards;
+}
+
+.dodge {
+  position: absolute;
+  top: 8px;
+  animation: fade 600ms var(--ease-out) forwards;
+}
+
+.dodge[data-side='left'] {
+  left: var(--space-4);
+}
+
+.dodge[data-side='right'] {
+  right: var(--space-4);
+}
+
+@keyframes burst {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes fade {
+  0%,
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .burstCore {
+    animation: none;
+    opacity: 0;
+  }
+}

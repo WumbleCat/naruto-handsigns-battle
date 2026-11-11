@@ -1,0 +1,34 @@
+.trail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.trail[data-direction='rtl'] {
+  align-items: flex-end;
+}
+
+.slots {
+  list-style: none;
+  display: flex;
+  gap: var(--space-2);
+}
+
+.trail[data-direction='rtl'] .slots {
+  flex-direction: row-reverse;
+}
+
+.slot {
+  display: flex;
+  transition: opacity var(--dur-base);
+}
+
+.trail[data-fading] .slot {
+  opacity: 0.45;
+}
+
+.candidate {
+  color: var(--text-2);
+  font-size: var(--text-lead);
+}

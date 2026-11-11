@@ -32,11 +32,12 @@ detector, and the `/dev/recorder` page that captures labelled landmark samples a
 them. The recorder was driven end to end in headless Chrome with a fake camera: tracking
 reached "ready" and a capture completed with no console errors. 137 tests pass.
 
-Milestone v0.4.0 is in progress: the OpponentSource contract and the three-difficulty bot are
-done and merged.
+Milestone v0.4.0 is in progress: the bot, the battle controller, the pre-battle page and the
+battle stage are done. A keyboard match against the hard bot was driven end to end in headless
+Chrome (cast, dodge, incoming hit, pause, forfeit, hand-off to results) with no console errors.
 
-Next action: `feat/battle-page` (battle controller, HUD, pre-battle page, battle page), then
-`feat/results-and-persistence`.
+Next action: `feat/results-and-persistence` (results page, saving matches to Supabase with a
+retry queue), then tag v0.4.0.
 
 ## Milestone tracker
 
@@ -60,6 +61,15 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/battle-page`: The game is playable with the keyboard. A BattleController wires engine,
+  detector, stabiliser, opponent and a pause-aware clock, tested with a fake detector and a
+  scripted opponent. The pre-battle page offers the three difficulties, the input mode and a
+  camera check that explains the missing recognition model. The battle stage follows the design:
+  HP bars draining toward the centre with a damage ghost, timer, flight strip with clash bursts
+  and dodge marks, two video panels, the Substitution cooldown seal, both trails with the
+  candidate jutsu name, the countdown stamp, pause and forfeit dialog, result word, a live
+  region for hits, and a compact key map in keyboard mode. Dev builds without Supabase get a
+  "Continue as dev user" button so the game can be played before accounts are configured.
 - `feat/bot-opponent`: The OpponentSource contract and the bot behind it. Three difficulties
   from the balance table: sign pace with jitter, think time, long-jutsu preference, misfires
   that reset its own buffer, reading the player's opener to counter with the advantaged

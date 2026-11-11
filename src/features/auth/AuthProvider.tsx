@@ -1,6 +1,7 @@
 import type { Session } from '@supabase/supabase-js';
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { fetchProfile, isUsernameAvailable, updateUsername } from '../../lib/api/profiles';
+import { DEV_TOOLS_ENABLED } from '../../lib/env';
 import { supabase, type AppSupabaseClient } from '../../lib/supabase';
 import {
   AuthContext,
@@ -21,6 +22,30 @@ function requireClient(): AppSupabaseClient {
   return supabase;
 }
 
+// Dev builds without Supabase can play with a throwaway local user. Nothing is persisted
+// beyond this browser; matches are not saved.
+const DEV_USER_KEY = 'jutsu-duel.dev-user';
+const DEV_USER: AuthUser = { id: 'dev-user', email: null, username: 'dev_player' };
+const DEV_SIGN_IN_AVAILABLE = DEV_TOOLS_ENABLED && !supabase;
+
+function readDevUser(): AuthUser | null {
+  if (!DEV_SIGN_IN_AVAILABLE) return null;
+  try {
+    return localStorage.getItem(DEV_USER_KEY) === '1' ? DEV_USER : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeDevUser(signedIn: boolean): void {
+  try {
+    if (signedIn) localStorage.setItem(DEV_USER_KEY, '1');
+    else localStorage.removeItem(DEV_USER_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 function toAuthUser(session: Session, username: string | null): AuthUser {
   const metadataUsername: unknown = session.user.user_metadata['username'];
   return {
@@ -31,8 +56,10 @@ function toAuthUser(session: Session, username: string | null): AuthUser {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [status, setStatus] = useState<AuthStatus>(supabase ? 'loading' : 'signed-out');
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(() => readDevUser());
+  const [status, setStatus] = useState<AuthStatus>(() =>
+    supabase ? 'loading' : readDevUser() ? 'signed-in' : 'signed-out',
+  );
 
   useEffect(() => {
     const client = supabase;
@@ -99,11 +126,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signOut = useCallback(async () => {
-    if (!supabase) return;
+    if (!supabase) {
+      writeDevUser(false);
+      setUser(null);
+      setStatus('signed-out');
+      return;
+    }
     const { error } = await supabase.auth.signOut();
     if (error) throw mapSupabaseAuthError(error);
     setUser(null);
     setStatus('signed-out');
+  }, []);
+
+  const devSignIn = useCallback(() => {
+    if (!DEV_SIGN_IN_AVAILABLE) return;
+    writeDevUser(true);
+    setUser(DEV_USER);
+    setStatus('signed-in');
   }, []);
 
   const checkUsername = useCallback((username: string) => {
@@ -133,8 +172,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       isUsernameAvailable: checkUsername,
       updateUsername: changeUsername,
+      ...(DEV_SIGN_IN_AVAILABLE ? { devSignIn } : {}),
     }),
-    [status, user, signIn, signUp, signOut, checkUsername, changeUsername],
+    [status, user, signIn, signUp, signOut, checkUsername, changeUsername, devSignIn],
   );
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;

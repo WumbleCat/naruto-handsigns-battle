@@ -1,0 +1,69 @@
+.bar {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'value track'
+    'name name';
+  align-items: center;
+  column-gap: var(--space-3);
+  row-gap: var(--space-1);
+}
+
+.bar[data-side='right'] {
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'track value'
+    'name name';
+  text-align: right;
+}
+
+.track {
+  grid-area: track;
+  position: relative;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.fill,
+.ghost {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: var(--radius-full);
+}
+
+/* The bar drains toward the centre: left bar anchors left, right bar anchors right. */
+.bar[data-side='right'] .fill,
+.bar[data-side='right'] .ghost {
+  left: auto;
+  right: 0;
+}
+
+.fill {
+  background: var(--hp-fill);
+}
+
+.bar[data-low] .fill {
+  background: var(--danger);
+}
+
+.ghost {
+  background: var(--danger);
+  opacity: 0.6;
+  transition: width var(--dur-ghost) var(--ease-out);
+}
+
+.value {
+  grid-area: value;
+  text-align: right;
+}
+
+.name {
+  grid-area: name;
+  font-size: var(--text-small);
+  font-weight: 500;
+  color: var(--text-2);
+}

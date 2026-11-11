@@ -1,0 +1,48 @@
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: var(--stage-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--gutter) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background: var(--bg-stage);
+  color: var(--text);
+}
+
+.top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.centre {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 96 / 306;
+  min-height: 200px;
+}
+
+.trails {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.trailColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}

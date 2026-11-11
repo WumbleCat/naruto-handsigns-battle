@@ -39,6 +39,8 @@ export interface AuthState {
   signOut: () => Promise<void>;
   isUsernameAvailable: (username: string) => Promise<boolean>;
   updateUsername: (username: string) => Promise<void>;
+  /** Dev builds without Supabase only: sign in as a local throwaway user to play offline. */
+  devSignIn?: () => void;
 }
 
 export const AuthContext = createContext<AuthState | null>(null);
