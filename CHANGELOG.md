@@ -6,6 +6,21 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-11
+
+### Added
+
+- Camera service (`src/detection/camera.ts`) with device listing, constraint fallback and typed
+  errors for permission denied, no camera, camera in use and unplugged.
+- MediaPipe Hand Landmarker wrapper loaded on demand (GPU with CPU fallback), a landmark
+  overlay, and the `hands-v1` feature extractor (131 features, wrist-relative and
+  scale-invariant, consistent hand slots, presence flags) with invariance tests.
+- Keyboard sign detector: twelve rebindable keys through the same stabiliser as the webcam.
+- `VideoPanel` and `DetectionReadout` components.
+- Dev-only `/dev/recorder`: live preview with overlay, label picker, countdown, capture of N
+  samples, undo, clear, import and export of `jutsu-duel-recording` JSON, and sign references
+  export for the Jutsu Book.
+
 ## [0.2.0] - 2026-11-11
 
 ### Added
