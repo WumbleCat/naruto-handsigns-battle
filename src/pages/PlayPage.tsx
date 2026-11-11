@@ -274,7 +274,10 @@ export function PlayPage() {
           <h2 id="key-map" className="t-heading">
             Keys
           </h2>
-          <p className="t-secondary">Hold a key for a quarter second to register its sign.</p>
+          <p className="t-secondary">
+            Hold a key for a quarter second to register its sign. On the stage you can also click
+            the signs; the camera stays off.
+          </p>
           <KeyMap bindings={settings.keyBindings} />
         </section>
       )}

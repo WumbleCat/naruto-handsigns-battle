@@ -14,11 +14,36 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface);
+  color: inherit;
+  font: inherit;
+  text-align: left;
   transition: border-color var(--dur-fast);
 }
 
 .key[data-held] {
   border-color: var(--text);
+}
+
+/* Interactive tiles are buttons: the player can hold a sign with the pointer. */
+.grid[data-interactive] .key {
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.grid[data-interactive] .key:hover {
+  border-color: var(--border-strong);
+}
+
+.grid[data-interactive] .key:active,
+.grid[data-interactive] .key[data-held] {
+  border-color: var(--text);
+  background: var(--surface-2);
+}
+
+.grid[data-interactive] .key:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 .cap {
@@ -52,4 +77,9 @@
 .grid[data-compact] .cap {
   min-width: 22px;
   height: 22px;
+}
+
+/* Clickable compact tiles keep a usable target. */
+.grid[data-compact][data-interactive] .key {
+  padding: var(--space-1);
 }

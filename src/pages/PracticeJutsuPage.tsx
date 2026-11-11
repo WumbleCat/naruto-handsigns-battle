@@ -14,6 +14,7 @@ import { CONTENT } from '../content/content.config';
 import { isRosterJutsuId, ROSTER_BY_ID, type RosterJutsuDef } from '../content/roster';
 import { createSignDetector } from '../detection/createDetector';
 import { modelStore, useModelState } from '../detection/model';
+import type { SignId } from '../engine/types';
 import { useFrameTick } from '../features/battle/hooks';
 import { KeyMap } from '../features/battle/KeyMap';
 import { useCamera } from '../features/camera/useCamera';
@@ -111,9 +112,27 @@ function PracticeSession({
   const attachVideo = useCallback((element: HTMLVideoElement | null) => {
     videoRef.current = element;
   }, []);
-  const { state: camera } = useCamera({ deviceId: settings.cameraDeviceId, enabled: true });
+  // Keyboard mode never asks for the camera: the sign pad takes its place.
+  const webcam = inputMode === 'webcam';
+  const { state: camera } = useCamera({ deviceId: settings.cameraDeviceId, enabled: webcam });
   const stream = camera.status === 'ready' ? camera.stream : null;
   const tracker = useHandTracker(videoRef, stream, camera.status === 'ready');
+
+  // On-screen sign buttons hold and release through the keyboard detector.
+  const padHold = useCallback(
+    (sign: SignId) => {
+      const detector = input.detector;
+      if (detector.kind === 'keyboard') detector.hold(sign);
+    },
+    [input],
+  );
+  const padRelease = useCallback(
+    (sign: SignId) => {
+      const detector = input.detector;
+      if (detector.kind === 'keyboard') detector.release(sign);
+    },
+    [input],
+  );
 
   // In webcam mode the detector classifies the frames this page's tracker produces.
   useEffect(() => {
@@ -157,20 +176,26 @@ function PracticeSession({
           <VideoPanel
             stream={stream}
             state={
-              camera.status === 'error' ? 'error' : camera.status === 'ready' ? 'live' : 'loading'
+              !webcam
+                ? 'no-stream'
+                : camera.status === 'error'
+                  ? 'error'
+                  : camera.status === 'ready'
+                    ? 'live'
+                    : 'loading'
             }
             label="Your camera"
             mirror={settings.mirrorVideo}
             onVideoElement={attachVideo}
             overlay={{ frameRef: tracker.frameRef, show: settings.showLandmarks }}
+            avatar={
+              <p className="t-secondary">
+                Keyboard mode: the camera stays off. Press keys or click the signs.
+              </p>
+            }
             error={{
-              title: inputMode === 'keyboard' ? 'Keyboard mode' : 'Camera unavailable',
-              body:
-                inputMode === 'keyboard'
-                  ? 'Your camera is off or unavailable. Keys still work.'
-                  : camera.status === 'error'
-                    ? camera.error.message
-                    : '',
+              title: 'Camera unavailable',
+              body: camera.status === 'error' ? camera.error.message : '',
             }}
           >
             <DetectionReadout
@@ -195,7 +220,14 @@ function PracticeSession({
             </div>
           ) : null}
           {inputMode === 'keyboard' ? (
-            <KeyMap bindings={settings.keyBindings} held={hold.sign} compact />
+            <KeyMap
+              bindings={settings.keyBindings}
+              held={hold.sign}
+              compact
+              holdMs={BALANCE.signHoldMs}
+              onHold={padHold}
+              onRelease={padRelease}
+            />
           ) : null}
         </div>
 

@@ -58,6 +58,8 @@ the schema once per project as described in [`supabase/README.md`](supabase/READ
 ### Playing with the keyboard
 
 Pick "Keyboard" on the pre-battle page. Each sign has a key; hold it for a quarter second.
+The camera stays off in this mode, and the key map on the battle and practice pages is a sign
+pad: click a sign button to register it, or press and hold one.
 
 | Key | Sign | Key | Sign | Key | Sign |
 |---|---|---|---|---|---|

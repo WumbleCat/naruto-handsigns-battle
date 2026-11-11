@@ -1,6 +1,6 @@
 # Progress and roadmap
 
-Last updated: 2026-11-11. Branch: `chore/release-0.6.0`.
+Last updated: 2026-11-11. Branch: `feat/sign-pad`.
 
 This is the living status page for Jutsu Duel. It answers three questions: where the project
 is, what changed recently, and what comes next. Release notes by version live in
@@ -56,6 +56,10 @@ settings sync and match history live, and recorded hand-sign sessions from `/dev
 train a real model (then `uv run train`, commit `public/models/signs-v1.json`). Deployment to
 Vercel is configured but not performed.
 
+After the tag, the owner asked for a way to test without a camera: keyboard mode now leaves the
+camera off and the key map is a clickable sign pad, with a test that casts a jutsu by clicking
+its signs (`feat/sign-pad`, unreleased).
+
 Next action: the owner's review of the demo. After that, v1.0.0 (online 1v1) per the plan in
 `docs/DESIGN.md` section 10, or any polish the review asks for.
 
@@ -81,6 +85,14 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/sign-pad`: Testing without a camera. In keyboard mode the battle and practice pages no
+  longer request the camera (the self panel says so), and the key map is a sign pad: each tile
+  is a button that holds its sign for the full hold time on a click, or for as long as it is
+  pressed. The buttons go through the keyboard detector, which gained `hold()`, `release()` and
+  a `tick()` so tests can drive it frame by frame; a test casts Fireball by clicking its three
+  signs through the real detector, stabiliser and engine. Verified in headless Chrome with no
+  camera permission at all: no `getUserMedia` call, a cast landed for 12 damage, a practice
+  jutsu completed by clicking.
 - `chore/release-0.6.0`: Closed milestone v0.6.0 with the CHANGELOG entry and this status
   update. Tagged v0.6.0. The single-player demo is complete; live accounts and real-hand
   recognition wait on the owner's Supabase project and recordings.
