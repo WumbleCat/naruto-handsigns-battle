@@ -7,6 +7,7 @@ import { App } from './app/App';
 import { ThemeProvider } from './app/providers/ThemeProvider';
 import { ToastProvider } from './components/Toast/Toast';
 import { CONTENT } from './content/content.config';
+import { AuthProvider } from './features/auth/AuthProvider';
 
 document.title = CONTENT.game.title;
 
@@ -19,7 +20,9 @@ createRoot(container).render(
   <StrictMode>
     <ThemeProvider>
       <ToastProvider>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </ToastProvider>
     </ThemeProvider>
   </StrictMode>,

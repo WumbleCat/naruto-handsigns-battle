@@ -1,0 +1,23 @@
+.narrowBanner {
+  max-width: var(--page-max-wide);
+  margin: var(--space-3) auto 0;
+  padding: 0 var(--gutter);
+}
+
+.textLink {
+  color: var(--text-2);
+  text-decoration: none;
+  font-weight: 500;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.textLink:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.username {
+  color: var(--text-2);
+  font-weight: 500;
+}
