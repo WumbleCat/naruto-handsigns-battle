@@ -1,5 +1,6 @@
 export { Banner, type BannerProps, type BannerTone } from './Banner/Banner';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button/Button';
+export { LinkButton, type LinkButtonProps } from './Button/LinkButton';
 export { DesktopOnlyNotice } from './DesktopOnlyNotice/DesktopOnlyNotice';
 export { Dialog, type DialogProps } from './Dialog/Dialog';
 export { PageShell, TopBar, type PageShellProps, type TopBarProps } from './PageShell/PageShell';
