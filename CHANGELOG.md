@@ -6,6 +6,22 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-11
+
+### Added
+
+- Settings: appearance, input mode, camera (device picker, test preview, mirror, landmarks,
+  detection threshold), key bindings with conflict refusal and reset, audio levels, account
+  (username change with availability check, log out). Settings sync with `user_settings`.
+- `KeyBindingInput` component.
+- Jutsu Book: every jutsu by element with sequence seals, damage from the balance config, what
+  it beats and loses to, and a reference card per sign with the recorded hand skeleton when
+  `src/content/sign-references.json` has one.
+- Practice: free practice and per-jutsu practice with live per-sign feedback, hold ring, miss
+  shake, completion stamp, time, best, attempts and completions; a pure, tested tracker.
+- Match History: paged table with filters, summary counts, jutsu seals and all empty, loading
+  and error states; `countMatches` and cursor paging in the matches API.
+
 ## [0.4.0] - 2026-11-11
 
 ### Added
