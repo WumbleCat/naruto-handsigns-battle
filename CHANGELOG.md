@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Sign pad: in keyboard mode the key map on the battle and practice pages is made of buttons.
+  Clicking one holds its sign for the full hold time; pressing and holding keeps it down.
+  Buttons go through the keyboard detector, so the stabiliser and engine see the same input.
+- `KeyboardSignDetector.hold()`, `release()` and `tick()`, plus a `schedule` option so tests
+  drive it frame by frame; a test casts a jutsu by clicking its signs through the real
+  detector, stabiliser and engine.
+
+### Changed
+
+- Keyboard mode no longer asks for the camera on the battle and practice pages; the self
+  panel says so and the sign pad takes its place.
+
 ## [0.6.0] - 2026-11-11
 
 ### Added
