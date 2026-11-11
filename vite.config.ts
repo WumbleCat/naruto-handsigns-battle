@@ -9,6 +9,13 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    watch: {
+      // Nothing under these is served; recordings in ml/data/raw are large and often locked
+      // while the trainer reads them, which otherwise floods the console with EBUSY errors.
+      ignored: ['**/ml/**', '**/supabase/**', '**/.claude/**'],
+    },
+  },
   test: {
     // Engine and library tests run in node. Component tests opt into jsdom per file with
     // `// @vitest-environment jsdom` at the top of the file.
