@@ -565,7 +565,9 @@ type EngineEvent =
 
 The six events you named are the core; the rest make the HUD and the bot simpler. Sound and
 visual effects later subscribe to this same stream through an `EffectsBus`; v1 ships placeholder
-effects only (a flash on hit, a burst glyph on clash).
+effects only (a flash on hit, a burst glyph on clash). As built, there is no `matchStarted`
+event: the engine is active from construction and the page knows the start time; the clock
+freezes at the end of the match so the snapshot's `now` reads as the final time.
 
 ### 8.4 Engine test plan (v0.2.0)
 

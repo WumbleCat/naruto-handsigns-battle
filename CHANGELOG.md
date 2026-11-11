@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-11
+
+### Added
+
+- The demo roster: eleven jutsus with sequences, themed names and flavour text, with tests for
+  the roster invariants (prefix-free, one opener per element, no repeated signs).
+- The complete balance config: damage table, clash multipliers, Substitution cooldown and whiff
+  rule, round timer, input timings and the bot parameter table.
+- The battle engine (`src/engine`): deterministic, timestamp-driven, pure TypeScript. Buffer
+  rules, automatic casting, flight, instant clash resolution, Substitution, KO, double-KO draw,
+  round timer, forfeit, per-player stats, typed events and immutable snapshots.
+- Sequence matcher with roster validation, element cycle helpers, and the sign stabiliser
+  (hold time and release rule). 105 tests in total.
+
 ## [0.1.0] - 2026-11-11
 
 ### Added
