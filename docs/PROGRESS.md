@@ -26,8 +26,15 @@ the deterministic battle engine (buffer rules, flight, instant clash, Substituti
 cooldown, KO, round timer, forfeit), the sequence matcher with roster validation, and the
 stabiliser, all pure TypeScript checked without the DOM lib. 105 tests pass.
 
-Next action: milestone v0.3.0, starting with `feat/camera-mediapipe` (camera service, MediaPipe
-hand tracking, landmark overlay), then `feat/keyboard-detector` and `feat/dev-recorder`.
+Milestone v0.3.0 is complete and tagged: camera service with typed errors, MediaPipe hand
+tracking loaded on demand with a landmark overlay, the 131-feature extractor, the keyboard
+detector, and the `/dev/recorder` page that captures labelled landmark samples and exports
+them. The recorder was driven end to end in headless Chrome with a fake camera: tracking
+reached "ready" and a capture completed with no console errors. 137 tests pass.
+
+Next action: milestone v0.4.0 on `feat/bot-opponent` (OpponentSource and the three-difficulty
+bot), then `feat/battle-page` (controller, HUD, pre-battle camera check) and
+`feat/results-and-persistence`.
 
 ## Milestone tracker
 
@@ -36,7 +43,7 @@ hand tracking, landmark overlay), then `feat/keyboard-detector` and `feat/dev-re
 | Phase 0 | Design docs, conventions, progress tracking | Done | | 2026-11-11 |
 | v0.1.0 | Scaffold, tooling, design tokens, routing, auth, protected routes | Done | v0.1.0 | 2026-11-11 |
 | v0.2.0 | Battle engine with full tests | Done | v0.2.0 | 2026-11-11 |
-| v0.3.0 | Webcam, MediaPipe overlay, keyboard detector, recorder route | Not started | | |
+| v0.3.0 | Webcam, MediaPipe overlay, keyboard detector, recorder route | Done | v0.3.0 | 2026-11-11 |
 | v0.4.0 | Battle page vs bot, results, match saved to Supabase | Not started | | |
 | v0.5.0 | Practice, Jutsu Book, Match History, Settings | Not started | | |
 | v0.6.0 | Training script, ML detector wired in, polish, README, Vercel config | Not started | | |
@@ -51,6 +58,15 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/camera-mediapipe`: The detection layer (one branch instead of the three planned, since
+  the pieces share one contract). Camera service with permission, not-found, in-use and
+  unplugged errors; MediaPipe hand tracking loaded on demand with GPU then CPU fallback and a
+  landmark overlay drawn outside React's render cycle; the 131-feature "hands-v1" extractor with
+  invariance tests; the keyboard detector (twelve keys, same 250 ms hold as the webcam);
+  VideoPanel and DetectionReadout components; and the dev-only recorder that captures
+  labelled landmark samples with a countdown, undo, import and export, plus "Save as
+  reference" for the Jutsu Book. Driven end to end in headless Chrome with a fake camera.
+  Tagged v0.3.0.
 - `feat/engine-core`: The battle engine exists and is fully tested: sign buffer with prefix
   matching, mismatch restarts and the 2.5 s timeout; automatic casting; 1.5 s flight; instant
   clashes with the 1.5x and 0.5x multipliers; Substitution with its 8 s cooldown and the whiff
