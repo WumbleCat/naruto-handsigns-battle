@@ -15,10 +15,12 @@ asked for a light theme in addition to the dark one. The decisions are recorded 
 `docs/DESIGN.md` section 13 and `docs/FRONTEND_DESIGN.md` sections 3 and 10; everything not
 explicitly decided proceeds with the defaults in `docs/DESIGN.md` section 14.
 
-Milestone v0.1.0 is in progress. The tooling scaffold is done and `npm run check` is green.
+Milestone v0.1.0 is in progress. The tooling scaffold and the design system foundation (tokens
+for both themes, fonts, content config, settings store, primitives) are done and `npm run check`
+is green.
 
-Next action: `feat/design-tokens` (tokens for both themes, fonts, theme provider, first
-primitives), then `feat/routing-shell`, then `feat/supabase-auth`.
+Next action: `feat/routing-shell` (router, page stubs, 404, desktop-only notice), then
+`feat/supabase-auth`.
 
 ## Milestone tracker
 
@@ -42,6 +44,12 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/design-tokens`: Design tokens for the dark and light themes, self-hosted fonts, the
+  themed content config (names, sign pose descriptions, difficulty names), a validated settings
+  store that persists the theme and applies it before first paint, and the first primitives:
+  Button, Seal with eighteen original glyphs, text and password fields, Toggle, Select, Slider,
+  SegmentedControl, Banner, Dialog, Toast, empty and error states, PageShell and the desktop-only
+  notice. Everything the pages need to look like the design doc.
 - `chore/scaffold`: Vite 8, React 19, TypeScript 5.9, ESLint 10 with type-aware rules, Prettier
   and Vitest 5 are in place and `npm run check` is green. The engine has its own DOM-free
   type-check config, and its first module defines the sign, element and player identifiers.
