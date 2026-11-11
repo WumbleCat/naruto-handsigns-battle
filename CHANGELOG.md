@@ -15,10 +15,22 @@ All notable changes to this project are documented here. The format follows
   drive it frame by frame; a test casts a jutsu by clicking its signs through the real
   detector, stabiliser and engine.
 
+- The first trained recognition model ships at `public/models/signs-v1.json` (one recording
+  session of the owner's hands, 98.9% validation accuracy), so webcam mode works from a fresh
+  clone.
+- `npm run model:check`: runs the shipped model over the recordings in `ml/data/raw/` with the
+  browser's inference code and prints accuracy per sign; the structural checks on the model
+  file run with every `npm test`.
+
 ### Changed
 
 - Keyboard mode no longer asks for the camera on the battle and practice pages; the self
   panel says so and the sign pad takes its place.
+
+### Fixed
+
+- The Vite dev watcher ignores `ml/`, `supabase/` and `.claude/`, which stops EBUSY errors
+  while the trainer reads a recording.
 
 ## [0.6.0] - 2026-11-11
 

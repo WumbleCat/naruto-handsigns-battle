@@ -1,6 +1,6 @@
 # Progress and roadmap
 
-Last updated: 2026-11-11. Branch: `feat/sign-pad`.
+Last updated: 2026-11-11. Branch: `chore/model-v1`.
 
 This is the living status page for Jutsu Duel. It answers three questions: where the project
 is, what changed recently, and what comes next. Release notes by version live in
@@ -52,13 +52,13 @@ smoke-tested in headless Chrome with a model trained on synthetic poses, with an
 file present, with no console errors.
 
 What the demo still needs from the owner: a Supabase project (`.env.local`) to try accounts,
-settings sync and match history live, and recorded hand-sign sessions from `/dev/recorder` to
-train a real model (then `uv run train`, commit `public/models/signs-v1.json`). Deployment to
-Vercel is configured but not performed.
+settings sync and match history live. Deployment to Vercel is configured but not performed.
 
 After the tag, the owner asked for a way to test without a camera: keyboard mode now leaves the
 camera off and the key map is a clickable sign pad, with a test that casts a jutsu by clicking
-its signs (`feat/sign-pad`, unreleased).
+its signs (`feat/sign-pad`, unreleased). The owner then recorded a session and trained the
+first real model, which now ships in the repository (`chore/model-v1`, unreleased); webcam
+mode works from a fresh clone.
 
 Next action: the owner's review of the demo. After that, v1.0.0 (online 1v1) per the plan in
 `docs/DESIGN.md` section 10, or any polish the review asks for.
@@ -85,6 +85,13 @@ it matters.
 
 ### 2026-11-11
 
+- `chore/model-v1`: The first trained model ships. The owner recorded one session (20,800
+  frames across the twelve signs and none) and trained with `uv run train`: 98.9% validation
+  accuracy, every sign above 0.94 recall, Tiger the weakest. The export is committed at
+  `public/models/signs-v1.json` so webcam mode works from a fresh clone. A new test validates
+  the shipped file with every `npm test`, and `npm run model:check` runs it over the local
+  recordings with the browser's inference code and prints accuracy per sign. The Vite watcher
+  now ignores `ml/` so a recording being read by the trainer no longer floods the console.
 - `feat/sign-pad`: Testing without a camera. In keyboard mode the battle and practice pages no
   longer request the camera (the self panel says so), and the key map is a sign pad: each tile
   is a button that holds its sign for the full hold time on a click, or for as long as it is

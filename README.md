@@ -21,9 +21,9 @@ product and technical design in [`docs/DESIGN.md`](docs/DESIGN.md) and the visua
 [`docs/FRONTEND_DESIGN.md`](docs/FRONTEND_DESIGN.md); working conventions in
 [`CLAUDE.md`](CLAUDE.md).
 
-Two things need the owner's hands before the demo is complete end to end: a Supabase project
-for accounts and match history (the app runs without one, see below), and recorded hand-sign
-samples to train the recognition model (keyboard mode works without one).
+One thing still needs the owner before the demo is complete end to end: a Supabase project for
+accounts and match history (the app runs without one, see below). A trained recognition model
+ships in the repository, so webcam mode works out of the box.
 
 ## Screenshots
 
@@ -72,8 +72,9 @@ Keys can be rebound in Settings. The sequences are listed in the Jutsu Book in t
 
 ### Playing with the webcam
 
-Webcam mode needs a trained recognition model at `public/models/signs-v1.json`, which is not in
-the repository because it is trained from your own recordings:
+Webcam mode needs a trained recognition model at `public/models/signs-v1.json`. The repository
+ships one trained on the owner's hands; it may read yours less well, and retraining on your own
+recordings takes a few minutes:
 
 1. `npm run dev`, open `/dev/recorder`, allow the camera, pick a label and capture about 100
    samples per sign (move and rotate your hands a little while it counts). Record `none` too:
@@ -87,7 +88,10 @@ the repository because it is trained from your own recordings:
    uv run train --data data/raw/*.json --out ../public/models/signs-v1.json
    ```
 
-3. Reload the app. The pre-battle camera check now asks you to hold the Ram sign; once it
+3. Check it with the browser's own inference code: `npm run model:check` runs the shipped model
+   over every recording in `ml/data/raw/` and prints accuracy per sign (`uv run evaluate` does
+   the same from Python).
+4. Reload the app. The pre-battle camera check now asks you to hold the Ram sign; once it
    registers, "Start battle" unlocks.
 
 Details, options and the evaluation command are in [`ml/README.md`](ml/README.md). The recorder
