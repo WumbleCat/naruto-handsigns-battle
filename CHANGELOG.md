@@ -6,6 +6,36 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-11
+
+### Added
+
+- `ml/`: the uv-managed trainer. Loads recorder exports, re-implements the hands-v1 features in
+  Python with a golden-file parity test against the TypeScript extractor, splits validation by
+  recording session, augments (jitter, scale, rotation, optional mirroring), trains the
+  131 → 128 → 64 → 13 MLP with class weights and early stopping, prints per-class recall, and
+  exports the browser JSON only after a numpy forward pass agrees with the torch model.
+  `uv run train`, `uv run evaluate`, `uv run pytest`.
+- Browser inference for the exported model in plain TypeScript (`src/detection/classifier.ts`)
+  and a model store that fetches `public/models/signs-v1.json` once and tells a missing file
+  from a broken one.
+- `MlSignDetector`: landmark frames to features, probabilities, a moving average and a sign,
+  through the same stabiliser as the keyboard. Webcam mode now works on the battle and
+  practice pages once a model is installed.
+- The pre-battle camera check runs the real detector on the preview and asks the player to
+  hold the Ram sign before "Start battle" unlocks; without a model it says keyboard mode is
+  available, and the battle page bounces to pre-battle if reached without one.
+- The recorder shows the live prediction of the installed model.
+- `vercel.json`: SPA rewrite, camera allowed for the site's origin, security headers, cache
+  headers for hashed assets and the model file. No deployment is made by the config.
+- README with setup, the keyboard map, the recorder-to-model workflow, the command list, a map
+  of the source tree and screenshots in `docs/screenshots/`.
+
+### Changed
+
+- `SignFrame` carries the optional class-probability vector from the design doc.
+- Practice waits for the model to load before deciding to fall back to the keyboard.
+
 ## [0.5.0] - 2026-11-11
 
 ### Added

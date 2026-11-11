@@ -1,6 +1,6 @@
 # Progress and roadmap
 
-Last updated: 2026-11-11. Branch: `feat/ml-detector`.
+Last updated: 2026-11-11. Branch: `chore/release-0.6.0`.
 
 This is the living status page for Jutsu Duel. It answers three questions: where the project
 is, what changed recently, and what comes next. Release notes by version live in
@@ -43,14 +43,21 @@ Milestone v0.5.0 is complete and tagged: every v1 page exists and is built to th
 Settings (synced to Supabase), the Jutsu Book, Practice and Match History joined the playable
 battle. 188 tests pass. Webcam play still waits on the recognition model.
 
-Milestone v0.6.0 is in progress: the uv-managed trainer in `ml/` is done, with the feature
-parity test passing against the TypeScript golden file, and the webcam detector is wired in.
-Webcam play now works end to end once a trained model sits at `public/models/signs-v1.json`;
-without one the pre-battle check, Practice and the recorder all say so. 198 tests pass. The
-pipeline was smoke-tested in headless Chrome with a model trained on synthetic poses (both
-with and without the file); recognising real hands still needs recordings from the owner.
+Milestone v0.6.0 is complete and tagged: the v1 demo is feature-complete. The uv-managed
+trainer in `ml/` turns recorder exports into the browser model; the webcam detector evaluates
+it in plain TypeScript through the same stabiliser as the keyboard; the pre-battle check proves
+camera, tracking, model and hold rule with one held sign; the Vercel config and the README with
+screenshots are in. 198 tests pass and `uv run pytest` passes. The webcam pipeline was
+smoke-tested in headless Chrome with a model trained on synthetic poses, with and without the
+file present, with no console errors.
 
-Next action: `chore/vercel-config` and `docs/readme` with screenshots, then tag v0.6.0.
+What the demo still needs from the owner: a Supabase project (`.env.local`) to try accounts,
+settings sync and match history live, and recorded hand-sign sessions from `/dev/recorder` to
+train a real model (then `uv run train`, commit `public/models/signs-v1.json`). Deployment to
+Vercel is configured but not performed.
+
+Next action: the owner's review of the demo. After that, v1.0.0 (online 1v1) per the plan in
+`docs/DESIGN.md` section 10, or any polish the review asks for.
 
 ## Milestone tracker
 
@@ -62,7 +69,7 @@ Next action: `chore/vercel-config` and `docs/readme` with screenshots, then tag 
 | v0.3.0 | Webcam, MediaPipe overlay, keyboard detector, recorder route | Done | v0.3.0 | 2026-11-11 |
 | v0.4.0 | Battle page vs bot, results, match saved to Supabase | Done | v0.4.0 | 2026-11-11 |
 | v0.5.0 | Practice, Jutsu Book, Match History, Settings | Done | v0.5.0 | 2026-11-11 |
-| v0.6.0 | Training script, ML detector wired in, polish, README, Vercel config | In progress | | |
+| v0.6.0 | Training script, ML detector wired in, polish, README, Vercel config | Done | v0.6.0 | 2026-11-11 |
 | v1.0.0 | Online 1v1: matchmaking, WebRTC video, Realtime signalling, sync, disconnects | Planned | | |
 
 Statuses: Planned, Not started, In progress, In review, Done, Blocked.
@@ -74,6 +81,18 @@ it matters.
 
 ### 2026-11-11
 
+- `chore/release-0.6.0`: Closed milestone v0.6.0 with the CHANGELOG entry and this status
+  update. Tagged v0.6.0. The single-player demo is complete; live accounts and real-hand
+  recognition wait on the owner's Supabase project and recordings.
+- `docs/readme`: The README now explains what the game is, setup with and without Supabase,
+  the keyboard map, the recorder-to-model workflow, every command, how the source tree is
+  split (pure engine, interchangeable detectors, content config), deployment notes and the
+  branch rules, with nine screenshots from headless Chrome in `docs/screenshots/` including a
+  won match and the webcam camera check.
+- `chore/vercel-config`: `vercel.json` for a static Vite deployment: SPA rewrite (a missing
+  model file falls through to index.html, which the app reads as "not installed"), camera
+  allowed for the site's own origin, nosniff, referrer and framing headers, immutable caching
+  for hashed assets and an hour for the model. Nothing is deployed by it.
 - `feat/ml-detector`: Webcam play is wired through. The browser evaluates the exported MLP in
   plain TypeScript (zod-validated file, shape checks per layer, standardise, relu, softmax); a
   model store fetches `public/models/signs-v1.json` once at startup and tells "missing" from
@@ -205,29 +224,13 @@ it matters.
 
 ## Roadmap
 
-### Now: v0.1.0, the foundation
+### Now: the owner's review of the v1 demo
 
-Vite, TypeScript, ESLint, Prettier and Vitest; design tokens for both themes and the first
-primitives; router, page stubs, 404 and the desktop-only notice; Supabase client, migrations,
-auth pages, profile trigger and protected routes. Branches: `chore/scaffold`,
-`feat/design-tokens`, `feat/routing-shell`, `feat/supabase-auth`.
+v0.1.0 to v0.6.0 are done (tracker above). Open for the owner: create a Supabase project and
+try accounts and history live; record sign sessions and train the first real model; decide
+whether to deploy to Vercel; report anything the review turns up as `fix/` branches.
 
-### Next: the rest of the v1 demo against the bot (v0.2.0 to v0.6.0)
-
-In order, each tagged when done. Branch plan in `docs/DESIGN.md` section 12.
-
-1. v0.2.0: Content, balance and roster config; the deterministic battle engine; the stabiliser;
-   the full test suite (damage table, element cycle, clash, Substitution, cooldown, buffer reset,
-   KO).
-2. v0.3.0: Camera service, MediaPipe hand tracking with the landmark overlay, keyboard detector,
-   feature extractor, `/dev/recorder`.
-3. v0.4.0: Bot with three difficulties, battle controller and HUD, results page, match
-   persistence.
-4. v0.5.0: Practice, Jutsu Book, Match History, Settings.
-5. v0.6.0: `/ml` training and evaluation with uv, ML detector wired in, polish pass, README with
-   setup and screenshots, Vercel config (no deployment without approval).
-
-### After v1: online 1v1 (v1.0.0)
+### Next: online 1v1 (v1.0.0)
 
 Designed in `docs/DESIGN.md` section 10 and built after the demo ships: queue-based
 matchmaking in Postgres, Supabase Realtime for signalling and fallback game messages, WebRTC
