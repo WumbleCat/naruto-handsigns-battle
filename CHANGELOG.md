@@ -14,3 +14,7 @@ All notable changes to this project are documented here. The format follows
   states).
 - `CLAUDE.md` with project conventions, commands, folder map and the git workflow.
 - Repository scaffold: `.gitignore`, `.gitattributes`, `.env.example`, README stub.
+- `docs/PROGRESS.md`: living status page with milestone tracker, dated update log, roadmap and
+  pending decisions.
+- `update-progress` Claude Code skill and a Stop hook (`.claude/hooks/progress-check.mjs`) that
+  blocks the end of a turn until new commits are reflected in `docs/PROGRESS.md`.
