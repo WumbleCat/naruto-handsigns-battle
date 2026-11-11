@@ -40,6 +40,10 @@ it matters.
 
 ### 2026-11-11
 
+- `docs/progress-tracker`: At the owner's request, removed the commits and the
+  `docs/design-doc-alt` branch that a second, parallel Claude session had added on 2026-11-09.
+  History now holds a single set of design docs (the first session's). Two sessions should not
+  work in this checkout at the same time.
 - `docs/progress-tracker`: Added this progress tracker, the `update-progress` skill that
   maintains it, and a Stop hook that refuses to end a Claude Code turn while the current branch
   has commits missing from this log. Progress now stays current without anyone remembering to
