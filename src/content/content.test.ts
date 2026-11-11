@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ELEMENTS, SIGN_IDS } from '../engine/types';
 import { CONTENT } from './content.config';
+import { JUTSU_IDS } from './roster';
 import { BOT_DIFFICULTIES } from './types';
 
 describe('content config', () => {
@@ -15,6 +16,15 @@ describe('content config', () => {
     for (const id of [...ELEMENTS, 'substitution'] as const) {
       expect(CONTENT.elements[id].name.length).toBeGreaterThan(0);
     }
+  });
+
+  it('names every jutsu in the roster', () => {
+    for (const id of JUTSU_IDS) {
+      expect(CONTENT.jutsus[id].name.length).toBeGreaterThan(0);
+      expect(CONTENT.jutsus[id].flavour.length).toBeGreaterThan(0);
+    }
+    const names = JUTSU_IDS.map((id) => CONTENT.jutsus[id].name);
+    expect(new Set(names).size).toBe(names.length);
   });
 
   it('names every bot difficulty', () => {

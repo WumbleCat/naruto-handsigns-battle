@@ -74,6 +74,23 @@ export const CONTENT: ContentConfig = {
     },
   },
 
+  jutsus: {
+    fire_short: { name: 'Fireball', flavour: 'A quick burst that punishes hesitation.' },
+    fire_long: {
+      name: 'Great Fire Annihilation',
+      flavour: 'Six signs. Nothing survives a clean hit.',
+    },
+    wind_short: { name: 'Wind Blade', flavour: 'Fast, thin, and sharp enough to interrupt.' },
+    wind_long: { name: 'Great Breakthrough', flavour: 'A wall of air that clears the field.' },
+    lightning_short: { name: 'Lightning Strike', flavour: 'Four signs, one flash.' },
+    lightning_long: { name: 'Thunderfall', flavour: 'Call the sky down on them.' },
+    earth_short: { name: 'Earth Spear', flavour: 'A stone lance from the ground.' },
+    earth_long: { name: 'Rising Landslide', flavour: 'Slow to build, impossible to stop.' },
+    water_short: { name: 'Water Bullet', flavour: 'The fastest answer to a fire.' },
+    water_long: { name: 'Water Dragon', flavour: 'The river takes the shape of a dragon.' },
+    substitution: { name: 'Substitution', flavour: 'Not there any more.' },
+  },
+
   difficulties: {
     easy: { name: 'Genin', blurb: 'Weaves slowly and never reads you.' },
     medium: { name: 'Chunin', blurb: 'Reads your trail after two signs.' },

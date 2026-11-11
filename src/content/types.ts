@@ -1,4 +1,5 @@
 import type { Element, SignId } from '../engine/types';
+import type { RosterJutsuId } from './roster';
 
 export const BOT_DIFFICULTIES = ['easy', 'medium', 'hard'] as const;
 export type BotDifficulty = (typeof BOT_DIFFICULTIES)[number];
@@ -14,6 +15,7 @@ export interface ContentConfig {
   };
   elements: Record<ThemedElement, { name: string; blurb: string }>;
   signs: Record<SignId, { name: string; pose: string }>;
+  jutsus: Record<RosterJutsuId, { name: string; flavour: string }>;
   difficulties: Record<BotDifficulty, { name: string; blurb: string }>;
   bot: { name: string };
   callouts: {

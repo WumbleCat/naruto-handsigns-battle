@@ -21,8 +21,11 @@ unique username, log in, log out, protected routes) behind three migrations with
 `npm run check` is green with 38 tests. Auth has been verified against a mocked client only;
 the owner still needs a Supabase project and `.env.local` to try it live.
 
-Next action: milestone v0.2.0 on `feat/content-config` (roster and full balance config) and
-`feat/engine-core` (the deterministic battle engine with its test suite).
+Milestone v0.2.0 is in progress: the roster, jutsu names and the full balance config (damage
+table, multipliers, cooldown rules, bot parameters) are done with invariant tests.
+
+Next action: `feat/engine-core`, the deterministic battle engine with the stabiliser, sequence
+matcher and the full test suite from `docs/DESIGN.md` section 8.4.
 
 ## Milestone tracker
 
@@ -30,7 +33,7 @@ Next action: milestone v0.2.0 on `feat/content-config` (roster and full balance 
 |---|---|---|---|---|
 | Phase 0 | Design docs, conventions, progress tracking | Done | | 2026-11-11 |
 | v0.1.0 | Scaffold, tooling, design tokens, routing, auth, protected routes | Done | v0.1.0 | 2026-11-11 |
-| v0.2.0 | Battle engine with full tests | Not started | | |
+| v0.2.0 | Battle engine with full tests | In progress | | |
 | v0.3.0 | Webcam, MediaPipe overlay, keyboard detector, recorder route | Not started | | |
 | v0.4.0 | Battle page vs bot, results, match saved to Supabase | Not started | | |
 | v0.5.0 | Practice, Jutsu Book, Match History, Settings | Not started | | |
@@ -46,6 +49,11 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/content-config`: The approved roster is now code: eleven jutsus with their sequences,
+  themed names and flavour lines, and the complete balance config (damage table, clash
+  multipliers, cooldown rules, round timer, bot parameters per difficulty). Tests pin the
+  roster invariants: prefix-free, one opener per element, no repeated signs, every length in
+  the damage table.
 - `feat/supabase-auth`: Real accounts. Three migrations create `profiles` (filled by a trigger
   from the username given at sign up), `matches` and `user_settings`, all with Row Level
   Security so a player only ever sees their own rows, plus a security-definer function the
