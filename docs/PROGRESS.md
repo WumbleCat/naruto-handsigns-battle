@@ -39,9 +39,9 @@ match against the hard bot was driven end to end in headless Chrome with no cons
 171 tests pass. Webcam play waits on the recognition model (v0.6.0); live saving waits on the
 owner's Supabase project.
 
-Milestone v0.5.0 is in progress: Settings is complete (all sections, synced to Supabase).
+Milestone v0.5.0 is in progress: Settings and the Jutsu Book are complete.
 
-Next action: `feat/jutsu-book`, then `feat/practice` and `feat/match-history`.
+Next action: `feat/practice`, then `feat/match-history`, then tag v0.5.0.
 
 ## Milestone tracker
 
@@ -65,6 +65,11 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/jutsu-book`: The Jutsu Book lists every jutsu by element in cycle order (name, element
+  seal, the sequence as seals with sign names, damage read from the balance config, what it
+  beats and loses to, a Practice link) plus Substitution with its cooldown, and a reference for
+  all twelve signs: glyph, name, written pose, the bound key, and the recorded hand skeleton once
+  `src/content/sign-references.json` has an entry from the recorder's "Save as reference".
 - `feat/settings`: Settings is complete: theme, input mode, camera (device picker that learns
   names after permission, a test preview, mirror, landmarks, detection threshold), key bindings
   with conflict refusal and reset, audio levels stored for later, and the account section with
