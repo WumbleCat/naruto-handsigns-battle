@@ -15,20 +15,21 @@ asked for a light theme in addition to the dark one. The decisions are recorded 
 `docs/DESIGN.md` section 13 and `docs/FRONTEND_DESIGN.md` sections 3 and 10; everything not
 explicitly decided proceeds with the defaults in `docs/DESIGN.md` section 14.
 
-Milestone v0.1.0 is in progress. The tooling scaffold, the design system foundation and the
-routing shell (every v1 route, the designed Landing, Home, Login, Signup and Settings pages,
-stubs for the rest, 404, desktop-only rules, auth guards against a placeholder provider) are
-done and `npm run check` is green.
+Milestone v0.1.0 is complete and tagged: tooling, the design system in both themes, every v1
+route with the public pages built to the design doc, and Supabase accounts (sign up with a
+unique username, log in, log out, protected routes) behind three migrations with RLS.
+`npm run check` is green with 38 tests. Auth has been verified against a mocked client only;
+the owner still needs a Supabase project and `.env.local` to try it live.
 
-Next action: `feat/supabase-auth` (Supabase client, migrations with RLS, real sign up, log in,
-log out, profile trigger), then tag v0.1.0.
+Next action: milestone v0.2.0 on `feat/content-config` (roster and full balance config) and
+`feat/engine-core` (the deterministic battle engine with its test suite).
 
 ## Milestone tracker
 
 | Milestone | Scope | Status | Tag | Done |
 |---|---|---|---|---|
 | Phase 0 | Design docs, conventions, progress tracking | Done | | 2026-11-11 |
-| v0.1.0 | Scaffold, tooling, design tokens, routing, auth, protected routes | In progress | | |
+| v0.1.0 | Scaffold, tooling, design tokens, routing, auth, protected routes | Done | v0.1.0 | 2026-11-11 |
 | v0.2.0 | Battle engine with full tests | Not started | | |
 | v0.3.0 | Webcam, MediaPipe overlay, keyboard detector, recorder route | Not started | | |
 | v0.4.0 | Battle page vs bot, results, match saved to Supabase | Not started | | |
@@ -45,6 +46,13 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/supabase-auth`: Real accounts. Three migrations create `profiles` (filled by a trigger
+  from the username given at sign up), `matches` and `user_settings`, all with Row Level
+  Security so a player only ever sees their own rows, plus a security-definer function the
+  signup form uses to check username availability. The app's auth provider now talks to
+  Supabase: session restore, sign up with the confirm-email state, log in, log out, typed
+  error mapping. Without environment variables the app still boots and says accounts are not
+  configured. Tagged v0.1.0.
 - `feat/routing-shell`: React Router 8 with every v1 route in place. Landing (headline, the
   animated sign wheel, how a duel works, the element cycle), Home (brush index with a preview
   panel), Login, Signup (with debounced username check) and Settings (theme control) are built to
