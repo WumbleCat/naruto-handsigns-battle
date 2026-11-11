@@ -1,0 +1,145 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.note {
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--warn);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.stamp {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.stampWord {
+  color: var(--element-color, var(--text));
+  text-shadow: 0 0 24px var(--bg-stage);
+  animation: stamp var(--dur-base) var(--ease-stamp) both;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sequence {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  transition: background-color var(--dur-fast);
+}
+
+.step[data-state='current'] {
+  background: var(--surface);
+}
+
+.step[data-state='todo'] {
+  color: var(--text-muted);
+}
+
+.step[data-miss] {
+  animation: shake var(--dur-fast) linear 2;
+  color: var(--danger);
+}
+
+.stepName {
+  flex: 1 1 auto;
+  font-weight: 500;
+}
+
+.now {
+  font-size: var(--text-small);
+  color: var(--text-2);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3) var(--space-6);
+  margin: 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.stats dt {
+  font-size: var(--text-small);
+  color: var(--text-muted);
+}
+
+.stats dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding-top: var(--space-4);
+}
+
+@keyframes stamp {
+  from {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step[data-miss] {
+    animation: none;
+  }
+  .stampWord {
+    animation: none;
+  }
+}

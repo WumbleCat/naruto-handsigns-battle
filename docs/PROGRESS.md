@@ -39,9 +39,9 @@ match against the hard bot was driven end to end in headless Chrome with no cons
 171 tests pass. Webcam play waits on the recognition model (v0.6.0); live saving waits on the
 owner's Supabase project.
 
-Milestone v0.5.0 is in progress: Settings and the Jutsu Book are complete.
+Milestone v0.5.0 is in progress: Settings, the Jutsu Book and Practice are complete.
 
-Next action: `feat/practice`, then `feat/match-history`, then tag v0.5.0.
+Next action: `feat/match-history`, then tag v0.5.0.
 
 ## Milestone tracker
 
@@ -65,6 +65,12 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/practice`: Practice is complete. The list page offers free practice and every jutsu;
+  the jutsu page shows the camera with the readout, the sequence stamping sign by sign with a
+  hold ring on the current one, a shake on a wrong sign, the jutsu name stamping on completion,
+  and time, best, attempts and completions. The tracker is pure and tested with the same reset
+  rules as the battle buffer; without a recognition model the page falls back to the keyboard
+  and says so. Verified in headless Chrome: Fireball completed in 1.2 s with no console errors.
 - `feat/jutsu-book`: The Jutsu Book lists every jutsu by element in cycle order (name, element
   seal, the sequence as seals with sign names, damage read from the balance config, what it
   beats and loses to, a Practice link) plus Substitution with its cooldown, and a reference for
