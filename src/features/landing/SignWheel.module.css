@@ -1,0 +1,30 @@
+.wheel {
+  position: relative;
+  width: 360px;
+  height: 360px;
+  flex: 0 0 auto;
+  margin: 0 auto;
+}
+
+.slot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -24px 0 0 -24px;
+}
+
+.centre {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--text);
+  pointer-events: none;
+}
+
+.centreName {
+  color: var(--text-2);
+}

@@ -19,7 +19,7 @@ export const CONTENT: ContentConfig = {
     water: { name: 'Water', blurb: 'Beats Fire. Loses to Earth.' },
     substitution: {
       name: 'Substitution',
-      blurb: 'Negates a jutsu in flight. Costs nothing but an 8 second cooldown.',
+      blurb: 'Negates a jutsu in flight, then needs a moment to recharge.',
     },
   },
 

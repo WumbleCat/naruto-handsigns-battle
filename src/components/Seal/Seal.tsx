@@ -24,6 +24,8 @@ export interface SealProps {
   pulse?: boolean;
   /** Accessible name; defaults to the element or sign name from the content config. */
   label?: string;
+  /** Hide from assistive tech when a parent already describes the group. */
+  decorative?: boolean;
   className?: string;
 }
 
@@ -42,11 +44,12 @@ export function Seal({
   progress = 0,
   pulse = false,
   label,
+  decorative = false,
   className,
 }: SealProps) {
   const glyph: GlyphId | undefined = sign ?? element;
   const colourElement = tint ?? (sign ? undefined : element);
-  const name = label ?? defaultLabel(element, sign);
+  const name = decorative ? undefined : (label ?? defaultLabel(element, sign));
   const style = {
     '--seal-size': `${size}px`,
     '--seal-progress': `${Math.max(0, Math.min(1, progress)) * 360}deg`,

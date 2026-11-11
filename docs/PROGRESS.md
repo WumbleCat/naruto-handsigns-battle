@@ -15,12 +15,13 @@ asked for a light theme in addition to the dark one. The decisions are recorded 
 `docs/DESIGN.md` section 13 and `docs/FRONTEND_DESIGN.md` sections 3 and 10; everything not
 explicitly decided proceeds with the defaults in `docs/DESIGN.md` section 14.
 
-Milestone v0.1.0 is in progress. The tooling scaffold and the design system foundation (tokens
-for both themes, fonts, content config, settings store, primitives) are done and `npm run check`
-is green.
+Milestone v0.1.0 is in progress. The tooling scaffold, the design system foundation and the
+routing shell (every v1 route, the designed Landing, Home, Login, Signup and Settings pages,
+stubs for the rest, 404, desktop-only rules, auth guards against a placeholder provider) are
+done and `npm run check` is green.
 
-Next action: `feat/routing-shell` (router, page stubs, 404, desktop-only notice), then
-`feat/supabase-auth`.
+Next action: `feat/supabase-auth` (Supabase client, migrations with RLS, real sign up, log in,
+log out, profile trigger), then tag v0.1.0.
 
 ## Milestone tracker
 
@@ -44,6 +45,13 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/routing-shell`: React Router 8 with every v1 route in place. Landing (headline, the
+  animated sign wheel, how a duel works, the element cycle), Home (brush index with a preview
+  panel), Login, Signup (with debounced username check) and Settings (theme control) are built to
+  the design doc; the other pages are honest stubs naming their milestone. Protected routes
+  redirect to login with a return path, signed-in players skip the public pages, screens below
+  1024 px get the desktop-only notice, and dev routes exist only in dev builds. Auth runs
+  against a placeholder provider until Supabase lands.
 - `feat/design-tokens`: Design tokens for the dark and light themes, self-hosted fonts, the
   themed content config (names, sign pose descriptions, difficulty names), a validated settings
   store that persists the theme and applies it before first paint, and the first primitives:

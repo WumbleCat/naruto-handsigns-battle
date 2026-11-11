@@ -1,0 +1,7 @@
+.summary {
+  margin-top: calc(-1 * var(--space-4));
+}
+
+.milestone {
+  color: var(--text-muted);
+}
