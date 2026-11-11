@@ -1,0 +1,72 @@
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'head action'
+    'sequence sequence'
+    'facts facts';
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-6) 0;
+  border-top: 1px solid var(--border);
+}
+
+.row[data-active] {
+  border-left: 3px solid var(--element-color);
+  padding-left: var(--space-4);
+}
+
+.head {
+  grid-area: head;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.name {
+  margin: 0;
+}
+
+.flavour {
+  color: var(--text-muted);
+  font-size: var(--text-small);
+}
+
+.sequence {
+  grid-area: sequence;
+  list-style: none;
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 48px;
+}
+
+.stepName {
+  font-size: var(--text-small);
+  color: var(--text-2);
+}
+
+.facts {
+  grid-area: facts;
+  display: flex;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+  color: var(--text-2);
+}
+
+.fact strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.action {
+  grid-area: action;
+  align-self: start;
+}
