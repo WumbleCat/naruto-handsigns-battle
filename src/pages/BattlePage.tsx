@@ -130,14 +130,31 @@ function BattleStage({
 
   useEffect(() => () => controller.stop(), [controller]);
 
-  // Camera for the self panel; optional in keyboard mode.
+  // Camera for the self panel. Keyboard mode never asks for it: the sign pad takes its place.
+  const webcam = setup.inputMode === 'webcam';
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const attachVideo = useCallback((element: HTMLVideoElement | null) => {
     videoRef.current = element;
   }, []);
-  const { state: camera } = useCamera({ deviceId: settings.cameraDeviceId, enabled: true });
+  const { state: camera } = useCamera({ deviceId: settings.cameraDeviceId, enabled: webcam });
   const stream = camera.status === 'ready' ? camera.stream : null;
   const tracker = useHandTracker(videoRef, stream, camera.status === 'ready');
+
+  // On-screen sign buttons hold and release through the keyboard detector.
+  const padHold = useCallback(
+    (sign: SignId) => {
+      const detector = controller.detector;
+      if (detector.kind === 'keyboard') detector.hold(sign);
+    },
+    [controller],
+  );
+  const padRelease = useCallback(
+    (sign: SignId) => {
+      const detector = controller.detector;
+      if (detector.kind === 'keyboard') detector.release(sign);
+    },
+    [controller],
+  );
 
   // In webcam mode the detector classifies the frames this page's tracker produces.
   useEffect(() => {
@@ -270,21 +287,27 @@ function BattleStage({
         <VideoPanel
           stream={stream}
           state={
-            camera.status === 'error' ? 'error' : camera.status === 'ready' ? 'live' : 'loading'
+            !webcam
+              ? 'no-stream'
+              : camera.status === 'error'
+                ? 'error'
+                : camera.status === 'ready'
+                  ? 'live'
+                  : 'loading'
           }
           label={myName}
           mirror={settings.mirrorVideo}
           onVideoElement={attachVideo}
           overlay={{ frameRef: tracker.frameRef, show: settings.showLandmarks }}
           hit={hitSide === 'p1'}
+          avatar={
+            <p className="t-secondary">
+              Keyboard mode: the camera stays off. Press keys or click the signs.
+            </p>
+          }
           error={{
-            title: setup.inputMode === 'keyboard' ? 'Keyboard mode' : 'Camera unavailable',
-            body:
-              setup.inputMode === 'keyboard'
-                ? 'Your camera is off or unavailable. Keys still work.'
-                : camera.status === 'error'
-                  ? camera.error.message
-                  : '',
+            title: 'Camera unavailable',
+            body: camera.status === 'error' ? camera.error.message : '',
           }}
         >
           <DetectionReadout
@@ -330,7 +353,14 @@ function BattleStage({
             label="Your signs"
           />
           {setup.inputMode === 'keyboard' ? (
-            <KeyMap bindings={settings.keyBindings} held={hold.sign} compact />
+            <KeyMap
+              bindings={settings.keyBindings}
+              held={hold.sign}
+              compact
+              holdMs={BALANCE.signHoldMs}
+              onHold={padHold}
+              onRelease={padRelease}
+            />
           ) : null}
         </div>
         <div />
