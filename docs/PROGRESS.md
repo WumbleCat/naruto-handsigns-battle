@@ -32,12 +32,15 @@ detector, and the `/dev/recorder` page that captures labelled landmark samples a
 them. The recorder was driven end to end in headless Chrome with a fake camera: tracking
 reached "ready" and a capture completed with no console errors. 137 tests pass.
 
-Milestone v0.4.0 is in progress: the bot, the battle controller, the pre-battle page and the
-battle stage are done. A keyboard match against the hard bot was driven end to end in headless
-Chrome (cast, dodge, incoming hit, pause, forfeit, hand-off to results) with no console errors.
+Milestone v0.4.0 is complete and tagged: the game is playable against the bot with the
+keyboard, start to finish. Bot with three difficulties, battle controller, pre-battle page,
+the full battle stage, the results page, and match persistence with a retry queue. A keyboard
+match against the hard bot was driven end to end in headless Chrome with no console errors.
+171 tests pass. Webcam play waits on the recognition model (v0.6.0); live saving waits on the
+owner's Supabase project.
 
-Next action: `feat/results-and-persistence` (results page, saving matches to Supabase with a
-retry queue), then tag v0.4.0.
+Next action: milestone v0.5.0 on `feat/practice`, `feat/jutsu-book`, `feat/match-history` and
+`feat/settings`.
 
 ## Milestone tracker
 
@@ -47,7 +50,7 @@ retry queue), then tag v0.4.0.
 | v0.1.0 | Scaffold, tooling, design tokens, routing, auth, protected routes | Done | v0.1.0 | 2026-11-11 |
 | v0.2.0 | Battle engine with full tests | Done | v0.2.0 | 2026-11-11 |
 | v0.3.0 | Webcam, MediaPipe overlay, keyboard detector, recorder route | Done | v0.3.0 | 2026-11-11 |
-| v0.4.0 | Battle page vs bot, results, match saved to Supabase | In progress | | |
+| v0.4.0 | Battle page vs bot, results, match saved to Supabase | Done | v0.4.0 | 2026-11-11 |
 | v0.5.0 | Practice, Jutsu Book, Match History, Settings | Not started | | |
 | v0.6.0 | Training script, ML detector wired in, polish, README, Vercel config | Not started | | |
 | v1.0.0 | Online 1v1: matchmaking, WebRTC video, Realtime signalling, sync, disconnects | Planned | | |
@@ -61,6 +64,11 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/results-and-persistence`: The results page shows the result word, how the match ended
+  and in how long, the jutsu used with counts, damage dealt and taken, HP left, clashes and
+  Substitutions, with Rematch, Change difficulty and Back to menu. Finished matches are saved
+  to the `matches` table; a failed save is queued in localStorage and retried on the next
+  sign-in, and the page says which of those happened. Tagged v0.4.0.
 - `feat/battle-page`: The game is playable with the keyboard. A BattleController wires engine,
   detector, stabiliser, opponent and a pause-aware clock, tested with a fake detector and a
   scripted opponent. The pre-battle page offers the three difficulties, the input mode and a
