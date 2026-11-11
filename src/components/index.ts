@@ -6,6 +6,7 @@ export { DetectionReadout, type DetectionReadoutProps } from './DetectionReadout
 export { VideoPanel, type VideoPanelProps, type VideoPanelState } from './VideoPanel/VideoPanel';
 export { Dialog, type DialogProps } from './Dialog/Dialog';
 export { PageShell, TopBar, type PageShellProps, type TopBarProps } from './PageShell/PageShell';
+export { KeyBindingInput, type KeyBindingInputProps } from './KeyBindingInput/KeyBindingInput';
 export { Glyph, type GlyphProps } from './Seal/Glyph';
 export { GLYPHS, type GlyphId } from './Seal/glyphs';
 export { Seal, type SealProps, type SealSize, type SealVariant } from './Seal/Seal';
