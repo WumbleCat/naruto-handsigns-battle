@@ -1,0 +1,30 @@
+.block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-8);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  max-width: 60ch;
+}
+
+.block[data-tone='error'] {
+  border-left: 4px solid var(--danger);
+}
+
+.title {
+  font-size: var(--text-lead);
+  font-weight: 700;
+}
+
+.body {
+  color: var(--text-2);
+}
+
+.action {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}

@@ -1,0 +1,28 @@
+.skeleton {
+  display: block;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  background-image: linear-gradient(90deg, transparent 0, var(--surface) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1400ms ease-in-out infinite;
+}
+
+.skeleton[data-round] {
+  border-radius: var(--radius-full);
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background-image: none;
+  }
+}
