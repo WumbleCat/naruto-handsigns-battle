@@ -21,11 +21,13 @@ unique username, log in, log out, protected routes) behind three migrations with
 `npm run check` is green with 38 tests. Auth has been verified against a mocked client only;
 the owner still needs a Supabase project and `.env.local` to try it live.
 
-Milestone v0.2.0 is in progress: the roster, jutsu names and the full balance config (damage
-table, multipliers, cooldown rules, bot parameters) are done with invariant tests.
+Milestone v0.2.0 is complete and tagged: the roster, jutsu names and full balance config, plus
+the deterministic battle engine (buffer rules, flight, instant clash, Substitution and its
+cooldown, KO, round timer, forfeit), the sequence matcher with roster validation, and the
+stabiliser, all pure TypeScript checked without the DOM lib. 105 tests pass.
 
-Next action: `feat/engine-core`, the deterministic battle engine with the stabiliser, sequence
-matcher and the full test suite from `docs/DESIGN.md` section 8.4.
+Next action: milestone v0.3.0, starting with `feat/camera-mediapipe` (camera service, MediaPipe
+hand tracking, landmark overlay), then `feat/keyboard-detector` and `feat/dev-recorder`.
 
 ## Milestone tracker
 
@@ -33,7 +35,7 @@ matcher and the full test suite from `docs/DESIGN.md` section 8.4.
 |---|---|---|---|---|
 | Phase 0 | Design docs, conventions, progress tracking | Done | | 2026-11-11 |
 | v0.1.0 | Scaffold, tooling, design tokens, routing, auth, protected routes | Done | v0.1.0 | 2026-11-11 |
-| v0.2.0 | Battle engine with full tests | In progress | | |
+| v0.2.0 | Battle engine with full tests | Done | v0.2.0 | 2026-11-11 |
 | v0.3.0 | Webcam, MediaPipe overlay, keyboard detector, recorder route | Not started | | |
 | v0.4.0 | Battle page vs bot, results, match saved to Supabase | Not started | | |
 | v0.5.0 | Practice, Jutsu Book, Match History, Settings | Not started | | |
@@ -49,6 +51,12 @@ it matters.
 
 ### 2026-11-11
 
+- `feat/engine-core`: The battle engine exists and is fully tested: sign buffer with prefix
+  matching, mismatch restarts and the 2.5 s timeout; automatic casting; 1.5 s flight; instant
+  clashes with the 1.5x and 0.5x multipliers; Substitution with its 8 s cooldown and the whiff
+  rule; KO, double-KO draw, round timer and forfeit; per-player stats. It is pure TypeScript,
+  deterministic, driven by timestamps, and type-checked without the DOM lib. The stabiliser
+  (250 ms hold, release rule) and the roster validator ship with it. Tagged v0.2.0.
 - `feat/content-config`: The approved roster is now code: eleven jutsus with their sequences,
   themed names and flavour lines, and the complete balance config (damage table, clash
   multipliers, cooldown rules, round timer, bot parameters per difficulty). Tests pin the
