@@ -70,3 +70,9 @@
   grid-area: action;
   align-self: start;
 }
+
+.stepLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
