@@ -1,6 +1,6 @@
 # Progress and roadmap
 
-Last updated: 2026-11-11. Branch: `chore/model-v1`.
+Last updated: 2026-11-15. Branch: `docs/github-remote`.
 
 This is the living status page for Jutsu Duel. It answers three questions: where the project
 is, what changed recently, and what comes next. Release notes by version live in
@@ -82,6 +82,13 @@ Statuses: Planned, Not started, In progress, In review, Done, Blocked.
 
 Newest first. One heading per day; each bullet names its branch and says what changed and why
 it matters.
+
+### 2026-11-15
+
+- `docs/github-remote`: The repository now lives at
+  https://github.com/WumbleCat/naruto-handsigns-battle (public). `main`, the six milestone
+  tags and every feature branch were pushed. From here on, branches are merged through pull
+  requests opened with `gh pr create`, as `CLAUDE.md` prescribes once a remote exists.
 
 ### 2026-11-11
 
@@ -269,10 +276,11 @@ snapshots, disconnect handling with a 20 s forfeit, and online matches recorded 
 Detailed in the design docs. Resolved items move into the update log with the decision.
 
 - None blocking. The rules and the visual direction were approved on 2026-11-11.
+- Resolved on 2026-11-15: the GitHub remote is `WumbleCat/naruto-handsigns-battle`, public.
 - Proceeding on defaults the owner can still override: roster names, match history detail, auth
-  rules, GitHub remote, package managers, small-screen threshold, keyboard tempo, model and
-  feature spec, training data in git, the `main.py` stub, bot naming, browser support, licence
-  (DESIGN.md section 13 items 1 and 6 to 17; defaults in section 14).
+  rules, package managers, small-screen threshold, keyboard tempo, model and feature spec,
+  training data in git, the `main.py` stub, bot naming, browser support, licence (DESIGN.md
+  section 13 items 1 and 6 to 17; defaults in section 14).
 
 ## How this file is maintained
 
