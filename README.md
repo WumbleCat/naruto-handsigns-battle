@@ -151,7 +151,7 @@ trained `public/models/signs-v1.json` to ship webcam mode. Nothing deploys autom
 
 ## Contributing to this repository
 
-Work happens on `feat/`, `fix/`, `docs/`, `chore/` and `test/` branches merged into `main` with
-`--no-ff` once `npm run check` passes. Commits follow Conventional Commits with a scope.
+Work happens on `feat/`, `fix/`, `docs/`, `chore/` and `test/` branches merged into `main`
+through a pull request once `npm run check` passes. Commits follow Conventional Commits with a scope.
 Milestones are tagged `v0.x.0` and recorded in `CHANGELOG.md`; `docs/PROGRESS.md` logs every
 branch. Never commit `.env.local`.
