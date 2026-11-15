@@ -1,6 +1,6 @@
 # Progress and roadmap
 
-Last updated: 2026-11-15. Branch: `feat/sign-figures`.
+Last updated: 2026-11-15. Branch: `feat/faster-weaving`.
 
 This is the living status page for Jutsu Duel. It answers three questions: where the project
 is, what changed recently, and what comes next. Release notes by version live in
@@ -85,6 +85,12 @@ it matters.
 
 ### 2026-11-15
 
+- `feat/faster-weaving`: The owner asked for quicker weaving after playing with the webcam
+  model. The sign hold time drops from 250 ms to 150 ms in the balance config (webcam and
+  keyboard alike), the design doc states the new value, and the three pieces of copy that
+  quoted "a quarter second" now read the number from the config. The owner also pruned Ram
+  from the first recording, captured it again, and the retrained model (99.0% on a random
+  frame split, Ram recall 0.972) and regenerated references ship on `feat/sign-figures`.
 - `feat/sign-figures`: Players can now see how to form each sign. A `SignFigure` draws the
   recorded hand skeleton for a sign (mirrored to match the preview, falling back to the glyph)
   and appears in the Jutsu Book sequences and cards, on the Practice page (a large figure of

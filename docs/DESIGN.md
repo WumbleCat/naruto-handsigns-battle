@@ -149,7 +149,7 @@ Every other pairing, including same-element, is neutral.
 Each player has a buffer of registered signs.
 
 1. A sign is **registered** when the stabiliser has seen the same sign above the confidence
-   threshold continuously for `signHoldMs` = 250 ms. After a sign registers, the same sign cannot
+   threshold continuously for `signHoldMs` = 150 ms. After a sign registers, the same sign cannot
    register again until a different sign or `none` has been observed (release rule), so holding
    a pose never double-registers.
 2. On registration, the engine appends the sign to the buffer if the result is a prefix of (or
@@ -295,7 +295,7 @@ flowchart LR
   mp --> feat[Feature extractor<br/>hands-v1, 131 floats]
   feat --> clf[MLP classifier<br/>13 classes incl. none]
   clf --> ema[EMA smoothing]
-  ema --> stab[Stabiliser<br/>hold 250 ms, release rule]
+  ema --> stab[Stabiliser<br/>hold 150 ms, release rule]
   kb[Keyboard detector] --> stab
   stab --> engine[BattleEngine.registerSign]
 ```
@@ -377,7 +377,7 @@ interface (`predict(features): Float32Array`) wraps it so a different model can 
 
 **Runtime post-processing**: exponential moving average over the probability vector
 (`smoothingAlpha` = 0.5), then arg-max; if the max probability is below the user's confidence
-threshold the frame is `none`. The stabiliser then applies the 250 ms hold and release rules.
+threshold the frame is `none`. The stabiliser then applies the 150 ms hold and release rules.
 
 ### 7.5 `SignDetector` interface
 
@@ -402,7 +402,7 @@ export interface SignDetector {
 
 - **KeyboardSignDetector**: 12 keys map to the 12 signs (defaults in section 9.4). While a key is
   held, it emits a frame with that sign at confidence 1.0 every animation frame; when released it
-  emits `none`. Signs therefore register after the same 250 ms hold as the webcam, so keyboard play
+  emits `none`. Signs therefore register after the same 150 ms hold as the webcam, so keyboard play
   has the same tempo and the engine sees identical input. (A dev toggle can shorten the hold for
   tests; see open questions.)
 - **MlSignDetector**: camera → MediaPipe → features → classifier → EMA → frame. Also exposes the
@@ -958,7 +958,7 @@ Decided by the owner on 2026-11-11:
    `pnpm` is not. Acceptable?
 10. **Small screens**: hard notice below 1024 px and a soft banner from 1024–1279 px (proposed),
     or a hard notice below 1280 px?
-11. **Keyboard tempo**: keyboard signs register after the same 250 ms hold as the webcam
+11. **Keyboard tempo**: keyboard signs register after the same 150 ms hold as the webcam
     (proposed, keeps balance identical). Should a dev toggle allow instant registration?
 12. **Model**: PyTorch MLP with the 131-feature spec (126 + 5), or strictly 126 features and/or
     scikit-learn for lighter Python dependencies?
@@ -984,7 +984,7 @@ Where this document had to choose, it chose as follows. Each stands unless you s
   the buffer.
 - A 120 s round cap exists; timeout is decided by remaining HP.
 - A sign identical to the previous buffered sign is ignored rather than treated as a mismatch.
-- Keyboard signs follow the same 250 ms hold as webcam signs.
+- Keyboard signs follow the same 150 ms hold as webcam signs.
 - Feature spec adds inter-hand offset and presence flags to the 126 landmark features (131 total).
 - The classifier is an MLP trained with PyTorch and shipped as plain JSON evaluated in TypeScript;
   no ML runtime in the browser.

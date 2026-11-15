@@ -73,6 +73,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
+- Faster weaving: a sign registers after a 150 ms hold instead of 250 ms, for the webcam and
+  the keyboard alike. The copy that states the hold time now reads it from the balance config.
 - `SignFrame` carries the optional class-probability vector from the design doc.
 - Practice waits for the model to load before deciding to fall back to the keyboard.
 
