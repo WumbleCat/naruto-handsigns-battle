@@ -13,6 +13,7 @@ import { CONTENT } from '../content/content.config';
 import { SIGN_IDS, type SignId } from '../engine/types';
 import { useAuth, validateUsername } from '../features/auth/authContext';
 import { describeAuthError } from '../features/auth/describeAuthError';
+import { holdLabel } from '../features/jutsu/holdLabel';
 import { CameraSection } from '../features/settings/CameraSection';
 import { useSavedFlash } from '../features/settings/useSavedFlash';
 import {
@@ -253,7 +254,7 @@ export function SettingsPage() {
       <SettingsSection
         id="keys"
         title="Key bindings"
-        description="One key per sign. Hold it for a quarter second to register."
+        description={`One key per sign. Hold it for ${holdLabel()} to register.`}
         saved={keysSaved}
       >
         <KeyBindingsSection />

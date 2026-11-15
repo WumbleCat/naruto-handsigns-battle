@@ -1,7 +1,7 @@
 # Jutsu Duel (working title)
 
 A desktop web game where you fight by performing Naruto-style hand signs on your webcam.
-Hold a sign for a quarter second to register it; complete a sequence to cast a jutsu that flies
+Hold a sign for a moment (150 ms) to register it; complete a sequence to cast a jutsu that flies
 at your opponent. Five elements beat each other in a cycle, longer sequences hit harder, two
 jutsu in the air at once clash, and a two-sign Substitution lets you dodge. First to bring the
 other fighter to 0 HP in two minutes wins.
@@ -57,7 +57,7 @@ the schema once per project as described in [`supabase/README.md`](supabase/READ
 
 ### Playing with the keyboard
 
-Pick "Keyboard" on the pre-battle page. Each sign has a key; hold it for a quarter second.
+Pick "Keyboard" on the pre-battle page. Each sign has a key; hold it for a moment (150 ms).
 The camera stays off in this mode, and the key map on the battle and practice pages is a sign
 pad: click a sign button to register it, or press and hold one.
 
@@ -141,7 +141,7 @@ supabase/        Migrations with RLS. ml/ is the uv-managed trainer. docs/ holds
 
 The engine takes registered signs with timestamps and emits events (`jutsuCast`, `clash`, `hit`,
 `dodge`, `ko`, ...). A detector produces per-frame sign predictions; a stabiliser turns them into
-registered signs after a 250 ms hold. The keyboard detector and the webcam detector are
+registered signs after a 150 ms hold. The keyboard detector and the webcam detector are
 interchangeable, so the bot, the controller and the tests never know which one is in use. All
 rules and numbers (100 HP, 120 s round, 12/18/26/36 damage for 3 to 6 signs, 1.5 s flight,
 1.5x and 0.5x clash multipliers, the 8 s Substitution cooldown, the 2.5 s buffer reset) live in

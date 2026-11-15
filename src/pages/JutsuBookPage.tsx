@@ -4,6 +4,7 @@ import { Seal } from '../components/Seal/Seal';
 import { CONTENT } from '../content/content.config';
 import { ROSTER, ROSTER_BY_ID } from '../content/roster';
 import { ELEMENTS, SIGN_IDS } from '../engine/types';
+import { holdLabel } from '../features/jutsu/holdLabel';
 import { JutsuRow } from '../features/jutsu/JutsuRow';
 import { SignReference } from '../features/jutsu/SignReference';
 import { useSettings } from '../lib/settings/store';
@@ -63,8 +64,7 @@ export function JutsuBookPage() {
           The twelve {CONTENT.terms.signPlural}
         </h2>
         <p className="t-secondary measure">
-          Every sequence is built from these. Hold a sign steady for a quarter second and it
-          registers.
+          Every sequence is built from these. Hold a sign steady for {holdLabel()} and it registers.
         </p>
         <div className={styles.signGrid}>
           {SIGN_IDS.map((sign) => (
