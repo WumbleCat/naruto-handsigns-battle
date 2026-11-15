@@ -93,6 +93,12 @@ recordings takes a few minutes:
    the same from Python).
 4. Reload the app. The pre-battle camera check now asks you to hold the Ram sign; once it
    registers, "Start battle" unlocks.
+5. Optional: `uv run references --data data/raw/*.json --out ../src/content/sign-references.json`
+   refreshes the hand-sign figures (the skeleton drawn for each sign in the Jutsu Book, on the
+   Practice page and on the key map) from your own recordings.
+
+To re-record one sign, drop it from the old recording first: `uv run prune --data <file>
+--drop ram`, then record, train and refresh the references as above.
 
 Details, options and the evaluation command are in [`ml/README.md`](ml/README.md). The recorder
 also shows the live prediction of the installed model, so a new model can be judged by eye.

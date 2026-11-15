@@ -1,6 +1,7 @@
 import { Seal } from '../../components/Seal/Seal';
 import { CONTENT } from '../../content/content.config';
 import type { SignId } from '../../engine/types';
+import { useSettings } from '../../lib/settings/store';
 import { keyLabel } from '../battle/keyLabel';
 import { signReference } from './signReferences';
 import styles from './SignReference.module.css';
@@ -15,6 +16,7 @@ export interface SignReferenceProps {
 /** One sign: glyph, name, how to form it (skeleton or words), and its key. */
 export function SignReference({ sign, keyCode }: SignReferenceProps) {
   const reference = signReference(sign);
+  const mirror = useSettings().mirrorVideo;
   const name = CONTENT.signs[sign].name;
   return (
     <article className={styles.card}>
@@ -33,6 +35,7 @@ export function SignReference({ sign, keyCode }: SignReferenceProps) {
           width={reference.width}
           height={reference.height}
           size={200}
+          mirror={mirror}
           label={`How to form ${name}`}
         />
       ) : null}

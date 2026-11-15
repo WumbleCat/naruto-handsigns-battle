@@ -21,16 +21,30 @@ All notable changes to this project are documented here. The format follows
 - `npm run model:check`: runs the shipped model over the recordings in `ml/data/raw/` with the
   browser's inference code and prints accuracy per sign; the structural checks on the model
   file run with every `npm test`.
+- Hand-sign figures: every sign now shows how to form it as a recorded hand skeleton, drawn
+  mirrored to match the camera preview. They appear in the Jutsu Book (sequence steps and the
+  sign cards), on the Practice page (a large figure of the sign to make next, a small one per
+  step, and a grid of all twelve in free practice) and on the key map of the pre-battle page.
+  `src/content/sign-references.json` holds the twelve references extracted from the owner's
+  recording.
+- `uv run references`: picks the most typical frame per sign from recordings (the medoid in
+  feature space) and writes the references file. `uv run prune --drop <sign>` removes a sign
+  from a recording so it can be re-recorded.
 
 ### Changed
 
 - Keyboard mode no longer asks for the camera on the battle and practice pages; the self
   panel says so and the sign pad takes its place.
+- The trainer falls back to a random split, and says so, when the recording sessions do not
+  each hold every sign (a re-recording of one sign), instead of holding that sign out of
+  training.
 
 ### Fixed
 
 - The Vite dev watcher ignores `ml/`, `supabase/` and `.claude/`, which stops EBUSY errors
   while the trainer reads a recording.
+- The camera picker in Settings no longer lists the unnamed devices browsers report before
+  camera permission is granted, which rendered duplicate entries with empty ids.
 
 ## [0.6.0] - 2026-11-11
 

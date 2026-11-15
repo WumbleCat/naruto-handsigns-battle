@@ -6,6 +6,7 @@ import type { RosterJutsuDef } from '../../content/roster';
 import { counterOf } from '../../engine/elements';
 import { damageOf } from './damageOf';
 import styles from './JutsuRow.module.css';
+import { SignFigure } from './SignFigure';
 
 export interface JutsuRowProps {
   jutsu: RosterJutsuDef;
@@ -38,8 +39,11 @@ export function JutsuRow({ jutsu, practiceLink = true, active = false }: JutsuRo
       <ol className={styles.sequence} aria-label={`${name} sequence`}>
         {jutsu.sequence.map((sign, index) => (
           <li key={`${sign}-${index}`} className={styles.step}>
-            <Seal sign={sign} tint={element} size={32} />
-            <span className={styles.stepName}>{CONTENT.signs[sign].name}</span>
+            <SignFigure sign={sign} tint={element} size={72} decorative />
+            <span className={styles.stepLabel}>
+              <Seal sign={sign} tint={element} size={24} decorative />
+              <span className={styles.stepName}>{CONTENT.signs[sign].name}</span>
+            </span>
           </li>
         ))}
       </ol>

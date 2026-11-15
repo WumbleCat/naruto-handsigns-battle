@@ -14,12 +14,13 @@ import { CONTENT } from '../content/content.config';
 import { isRosterJutsuId, ROSTER_BY_ID, type RosterJutsuDef } from '../content/roster';
 import { createSignDetector } from '../detection/createDetector';
 import { modelStore, useModelState } from '../detection/model';
-import type { SignId } from '../engine/types';
+import { SIGN_IDS, type SignId } from '../engine/types';
 import { useFrameTick } from '../features/battle/hooks';
 import { KeyMap } from '../features/battle/KeyMap';
 import { useCamera } from '../features/camera/useCamera';
 import { useHandTracker } from '../features/camera/useHandTracker';
 import { damageOf } from '../features/jutsu/damageOf';
+import { SignFigure } from '../features/jutsu/SignFigure';
 import { PracticeInput } from '../features/practice/PracticeInput';
 import { PracticeTracker } from '../features/practice/PracticeTracker';
 import { useSettings } from '../lib/settings/store';
@@ -144,6 +145,7 @@ function PracticeSession({
 
   const hold = input.getHold(frame.now);
   const progress = input.tracker?.getProgress() ?? 0;
+  const nextSign = jutsu?.sequence[progress] ?? null;
   const stats = input.tracker?.getStats();
   const elapsed = input.tracker?.elapsed(frame.now) ?? null;
   const name = jutsu ? CONTENT.jutsus[jutsu.id].name : 'Free practice';
@@ -235,6 +237,12 @@ function PracticeSession({
           {jutsu ? (
             <>
               <h2 className="t-heading">Sequence</h2>
+              {nextSign ? (
+                <div className={styles.guide}>
+                  <SignFigure sign={nextSign} tint={element ?? undefined} size={160} />
+                  <p className={styles.guideText}>Make the {CONTENT.signs[nextSign].name} sign</p>
+                </div>
+              ) : null}
               <ol className={styles.sequence} aria-label={`${name} sequence`}>
                 {jutsu.sequence.map((sign, index) => {
                   const done = index < progress;
@@ -252,6 +260,13 @@ function PracticeSession({
                         size={32}
                         variant={done ? 'stamped' : current ? 'ring' : 'outline'}
                         progress={current && hold.sign === sign ? hold.fraction : 0}
+                        decorative
+                      />
+                      <SignFigure
+                        sign={sign}
+                        tint={element ?? undefined}
+                        size={40}
+                        bare
                         decorative
                       />
                       <span className={styles.stepName}>{CONTENT.signs[sign].name}</span>
@@ -291,6 +306,15 @@ function PracticeSession({
                     ].name
                   : 'Nothing yet. Hold a sign.'}
               </p>
+              <h2 className="t-heading">The twelve {CONTENT.terms.signPlural}</h2>
+              <ul className={styles.allSigns}>
+                {SIGN_IDS.map((sign) => (
+                  <li key={sign} className={styles.allSign}>
+                    <SignFigure sign={sign} size={72} decorative />
+                    <span>{CONTENT.signs[sign].name}</span>
+                  </li>
+                ))}
+              </ul>
             </>
           )}
           <div className={styles.actions}>
