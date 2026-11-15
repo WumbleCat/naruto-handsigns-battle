@@ -2,6 +2,7 @@ import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from 'react
 import { Seal } from '../../components/Seal/Seal';
 import { CONTENT } from '../../content/content.config';
 import { SIGN_IDS, type SignId } from '../../engine/types';
+import { SignFigure } from '../jutsu/SignFigure';
 import { keyLabel } from './keyLabel';
 import styles from './KeyMap.module.css';
 
@@ -109,7 +110,8 @@ export function KeyMap({
         const inner = (
           <>
             <kbd className={styles.cap}>{keyLabel(bindings[sign])}</kbd>
-            <Seal sign={sign} size={compact ? 24 : 32} decorative />
+            {compact ? null : <SignFigure sign={sign} size={56} bare decorative />}
+            <Seal sign={sign} size={24} decorative />
             {compact ? null : <span className={styles.name}>{name}</span>}
           </>
         );

@@ -1,6 +1,6 @@
 # Progress and roadmap
 
-Last updated: 2026-11-15. Branch: `docs/github-remote`.
+Last updated: 2026-11-15. Branch: `feat/sign-figures`.
 
 This is the living status page for Jutsu Duel. It answers three questions: where the project
 is, what changed recently, and what comes next. Release notes by version live in
@@ -85,6 +85,16 @@ it matters.
 
 ### 2026-11-15
 
+- `feat/sign-figures`: Players can now see how to form each sign. A `SignFigure` draws the
+  recorded hand skeleton for a sign (mirrored to match the preview, falling back to the glyph)
+  and appears in the Jutsu Book sequences and cards, on the Practice page (a large figure of
+  the next sign, small ones per step, all twelve in free practice) and on the pre-battle key
+  map. The references come from the owner's recording through a new `uv run references`
+  command that picks the medoid frame per sign; `uv run prune --drop <sign>` removes a badly
+  recorded sign so it can be re-recorded, and the trainer now falls back to a random split
+  with a warning when a session holds only some signs, instead of training without them.
+  Verified in headless Chrome: twelve labelled figures in the Jutsu Book, the practice guide
+  reads "Make the Horse sign" after Tiger, no console errors.
 - `docs/github-remote`: The repository now lives at
   https://github.com/WumbleCat/naruto-handsigns-battle (public). `main`, the six milestone
   tags and every feature branch were pushed. From here on, branches are merged through pull

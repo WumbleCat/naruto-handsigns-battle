@@ -52,7 +52,8 @@ def synthetic_samples(rng: np.random.Generator, session: str, per_label: int) ->
 def test_train_export_and_predict(tmp_path: Path) -> None:
     rng = np.random.default_rng(0)
     samples = synthetic_samples(rng, "a", 12) + synthetic_samples(rng, "b", 12)
-    train, val = split_by_session(samples, 0.5, seed=0)
+    train, val, mode = split_by_session(samples, 0.5, seed=0)
+    assert mode == "session"
     assert {s.session_id for s in train} != {s.session_id for s in val}
 
     exported, metrics = train_model(

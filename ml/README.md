@@ -9,6 +9,8 @@ uv sync                                        # create the venv and install dep
 uv run pytest                                  # includes the TS/Python feature parity test
 uv run train --data data/raw/*.json --out ../public/models/signs-v1.json
 uv run evaluate --model ../public/models/signs-v1.json --data data/raw/*.json
+uv run references --data data/raw/*.json --out ../src/content/sign-references.json
+uv run prune --data data/raw/recording-....json --drop ram
 ```
 
 ## Workflow
@@ -20,6 +22,26 @@ uv run evaluate --model ../public/models/signs-v1.json --data data/raw/*.json
 2. Drop the exported files into `ml/data/raw/` (git-ignored by default).
 3. `uv run train ...` prints validation accuracy and per-class recall and writes the model.
 4. Reload the app: webcam mode becomes available once `public/models/signs-v1.json` exists.
+5. `uv run references ...` writes `src/content/sign-references.json`: for each sign, the most
+   typical frame in the recordings (the medoid in feature space). The app draws these as hand
+   skeletons in the Jutsu Book, on the Practice page and on the key map, so players can see
+   how to form each sign. Re-run it whenever the recordings change.
+
+## Re-recording one sign
+
+If one sign was recorded badly, drop it from the old file, record it again, and train on both:
+
+```
+uv run prune --data data/raw/recording-2026-11-11.json --drop ram
+# in the app: /dev/recorder, label Ram, capture, export, move the file into data/raw/
+uv run train --data data/raw/*.json --out ../public/models/signs-v1.json
+uv run references --data data/raw/*.json --out ../src/content/sign-references.json
+```
+
+`prune` rewrites the file in place (pass `--out` to write elsewhere) and keeps its session id.
+A session that holds only one sign cannot be held out for validation on its own, so the
+trainer falls back to a random split of frames and says so; the accuracy it prints is then
+optimistic. Record a second full session when you want an honest number.
 
 ## Options
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import glob
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -19,6 +20,17 @@ class Sample:
     hands: list[dict[str, Any]]
     session_id: str
     aspect: float
+    width: float = 16.0
+    height: float = 9.0
+
+
+def expand_paths(patterns: list[str]) -> list[Path]:
+    """Recording paths from files or globs (PowerShell does not expand globs itself)."""
+    paths: list[Path] = []
+    for pattern in patterns:
+        matches = sorted(glob.glob(pattern))
+        paths.extend(Path(m) for m in matches) if matches else paths.append(Path(pattern))
+    return [p for p in paths if p.is_file()]
 
 
 def load_recording(path: Path) -> list[Sample]:
@@ -36,7 +48,9 @@ def load_recording(path: Path) -> list[Sample]:
         label = sample["label"]
         if label not in LABELS:
             raise ValueError(f"{path}: unknown label {label!r}")
-        samples.append(Sample(label=label, hands=sample["hands"], session_id=session_id, aspect=aspect))
+        samples.append(
+            Sample(label=label, hands=sample["hands"], session_id=session_id, aspect=aspect, width=width, height=height)
+        )
     return samples
 
 
@@ -54,20 +68,27 @@ def to_matrix(samples: list[Sample]) -> tuple[np.ndarray, np.ndarray]:
     return x, y
 
 
-def split_by_session(samples: list[Sample], val_fraction: float, seed: int) -> tuple[list[Sample], list[Sample]]:
+def split_by_session(samples: list[Sample], val_fraction: float, seed: int) -> tuple[list[Sample], list[Sample], str]:
     """Hold out whole sessions so validation measures a new recording session, not near-duplicate
-    frames. With a single session, falls back to a random split (and the caller warns)."""
+    frames. Returns (train, val, mode). Mode is "session" when that worked and "random" when it
+    could not: a single session, or sessions that each hold only some of the signs (a
+    re-recording of one sign), which would leave training without those signs."""
     rng = np.random.default_rng(seed)
     sessions = sorted({s.session_id for s in samples})
-    if len(sessions) < 2:
-        indices = rng.permutation(len(samples))
-        cut = int(round(len(samples) * (1 - val_fraction)))
-        train = [samples[i] for i in indices[:cut]]
-        val = [samples[i] for i in indices[cut:]]
-        return train, val
-    rng.shuffle(sessions)
-    held = max(1, int(round(len(sessions) * val_fraction)))
-    val_sessions = set(sessions[:held])
-    train = [s for s in samples if s.session_id not in val_sessions]
-    val = [s for s in samples if s.session_id in val_sessions]
-    return train, val
+    labels = {s.label for s in samples}
+    if len(sessions) >= 2:
+        order = list(sessions)
+        rng.shuffle(order)
+        held = max(1, int(round(len(order) * val_fraction)))
+        for start in range(len(order)):
+            rotated = order[start:] + order[:start]
+            val_sessions = set(rotated[:held])
+            train = [s for s in samples if s.session_id not in val_sessions]
+            val = [s for s in samples if s.session_id in val_sessions]
+            if val and {s.label for s in train} == labels:
+                return train, val, "session"
+    indices = rng.permutation(len(samples))
+    cut = int(round(len(samples) * (1 - val_fraction)))
+    train = [samples[i] for i in indices[:cut]]
+    val = [samples[i] for i in indices[cut:]]
+    return train, val, "random"
