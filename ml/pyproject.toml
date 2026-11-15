@@ -12,6 +12,8 @@ dependencies = [
 [project.scripts]
 train = "jutsu_ml.train:main"
 evaluate = "jutsu_ml.evaluate:main"
+prune = "jutsu_ml.prune:main"
+references = "jutsu_ml.references:main"
 
 [dependency-groups]
 dev = ["pytest>=8.0"]

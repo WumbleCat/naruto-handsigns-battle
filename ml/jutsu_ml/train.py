@@ -165,9 +165,13 @@ def main(argv: list[str] | None = None) -> int:
         print("Recordings contain no samples.", file=sys.stderr)
         return 2
     sessions = {s.session_id for s in samples}
-    if len(sessions) < 2:
-        print("Warning: only one recording session; validation uses a random split and will be optimistic.")
-    train_samples, val_samples = split_by_session(samples, args.val_fraction, args.seed)
+    train_samples, val_samples, split_mode = split_by_session(samples, args.val_fraction, args.seed)
+    if split_mode == "random":
+        print(
+            "Warning: validation is a random split of frames (one session, or a session holding only "
+            "some signs), so the accuracy below is optimistic. Record a second full session to measure "
+            "how the model does on new footage."
+        )
     print(f"{len(samples)} samples from {len(paths)} files, {len(sessions)} sessions; train {len(train_samples)}, val {len(val_samples)}")
 
     exported, metrics = train_model(
