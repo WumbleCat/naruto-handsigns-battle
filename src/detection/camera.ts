@@ -57,11 +57,17 @@ function mediaDevices(): MediaDevices {
   return navigator.mediaDevices;
 }
 
-/** Video inputs. Labels are empty until the user has granted camera permission once. */
+/**
+ * Video inputs. Until the user has granted camera permission once, browsers report devices
+ * with empty ids and labels; those cannot be chosen, so they are left out and the picker
+ * offers only the default camera.
+ */
 export async function listCameras(): Promise<CameraDevice[]> {
   const devices = await mediaDevices().enumerateDevices();
+  const seen = new Set<string>();
   return devices
-    .filter((device) => device.kind === 'videoinput')
+    .filter((device) => device.kind === 'videoinput' && device.deviceId !== '')
+    .filter((device) => !seen.has(device.deviceId) && seen.add(device.deviceId))
     .map((device, index) => ({
       deviceId: device.deviceId,
       label: device.label || `Camera ${index + 1}`,
