@@ -54,3 +54,7 @@ ml/data/raw/
 
 # Claude Code personal overrides
 .claude/settings.local.json
+
+# Playwright
+test-results/
+playwright-report/
