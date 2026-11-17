@@ -308,9 +308,10 @@ export class DuelRoom extends Room<{ state: DuelState; input: MoveInput }> {
       });
     }
     const reconnection = this.allowReconnection(client, 'manual');
+    const expire = reconnection.reject as () => void;
     const timer = this.clock.setTimeout(() => {
       this.graceTimers.delete(client.sessionId);
-      reconnection.reject();
+      expire();
     }, this.reconnectGraceMs);
     this.graceTimers.set(client.sessionId, timer);
     reconnection.catch(() => undefined);
@@ -374,6 +375,10 @@ export class DuelRoom extends Room<{ state: DuelState; input: MoveInput }> {
     const wasPlaying = sim.phase === 'PLAYING';
     const events = stepDuel(sim);
     if (wasPlaying) this.playedTicks += 1;
+    // Inputs sent during a countdown or pause are stale by the time play (re)starts.
+    if (!wasPlaying && sim.phase === 'PLAYING') {
+      for (const player of sim.players) this.inputs.get(player.id).clear();
+    }
     for (const event of events) this.publish(event);
     this.sync();
   }

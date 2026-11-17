@@ -5,12 +5,20 @@ import { WebSocketTransport } from '@colyseus/ws-transport';
 import { DUEL_ROOM_NAME } from '@jutsu-duel/duel-shared';
 import { DuelRoom, TEST_TIMINGS_ALLOWED } from './rooms/DuelRoom.ts';
 
+/** The slice of the Express app the health probe needs; express types are not installed. */
+interface HealthRoutes {
+  get: (
+    path: string,
+    handler: (req: unknown, res: { json: (body: unknown) => void }) => void,
+  ) => void;
+}
+
 export function createDuelServer(): Server {
   const server = new Server({
     transport: new WebSocketTransport(),
     greet: false,
-    express: (app) => {
-      app.get('/health', (_req: unknown, res: { json: (body: unknown) => void }) => {
+    express: (app: HealthRoutes) => {
+      app.get('/health', (_req, res) => {
         res.json({ ok: true, room: DUEL_ROOM_NAME });
       });
     },

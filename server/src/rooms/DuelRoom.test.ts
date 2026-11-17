@@ -14,13 +14,13 @@ import {
   type MatchResultMessage,
 } from '@jutsu-duel/duel-shared';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import type { DuelRoom as DuelRoomInstance } from './DuelRoom.ts';
 
 vi.hoisted(() => {
   process.env.DUEL_ALLOW_TEST_TIMINGS = 'true';
 });
 
 const { createDuelServer } = await import('../index.ts');
-const { DuelRoom } = await import('./DuelRoom.ts');
 
 const PORT = 2599;
 const FAST = {
@@ -71,17 +71,17 @@ function sleep(ms: number): Promise<void> {
 }
 
 async function createDuel(options: object = FAST) {
-  const room = await colyseus.createRoom<InstanceType<typeof DuelRoom>>(DUEL_ROOM_NAME, options);
+  const room = await colyseus.createRoom<DuelRoomInstance>(DUEL_ROOM_NAME, options);
   return room;
 }
 
-async function connect(room: InstanceType<typeof DuelRoom>, nickname: string): Promise<ClientRoom> {
+async function connect(room: DuelRoomInstance, nickname: string): Promise<ClientRoom> {
   const client = await colyseus.connectTo(room, { nickname });
   open.push(client);
   return client;
 }
 
-async function startMatch(room: InstanceType<typeof DuelRoom>) {
+async function startMatch(room: DuelRoomInstance) {
   const a = await connect(room, 'Alpha');
   const b = await connect(room, 'Beta');
   a.send(CLIENT_MESSAGES.READY, { ready: true });
