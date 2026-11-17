@@ -20,7 +20,8 @@ export default defineConfig({
     // Engine and library tests run in node. Component tests opt into jsdom per file with
     // `// @vitest-environment jsdom` at the top of the file.
     environment: 'node',
-    include: ['src/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}', 'packages/**/*.test.ts', 'server/**/*.test.ts'],
+    exclude: ['**/node_modules/**', 'tests/e2e/**'],
     setupFiles: ['./src/test/setup.ts'],
     css: false,
   },

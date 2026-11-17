@@ -8,6 +8,15 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- Online duel (`/duel`): a server-authoritative 1v1 mode from the owner's specification in
+  `docs/handsign-duel/`. Two guests create and join a private room by code, ready up, and fight
+  in a 1200 × 700 arena with WASD movement, a stamina-costing dodge with i-frames, HP / chakra /
+  stamina regeneration, three jutsu cast by ordered hand signs (Fireball, Lightning Spear, Water
+  Shield), real projectiles with swept collision, a 180 s timer, knockout / timeout / forfeit
+  results and rematch. Hand signs come from the Q E R T Y U I mock keys or the webcam through the
+  trained model. The shared rules live in `packages/duel-shared`, the Colyseus 0.18 room in
+  `server`, the client under `src/duel`. Run both with `npm run dev:duel`; `npm run test:e2e`
+  plays a whole match in two browsers.
 - Sign pad: in keyboard mode the key map on the battle and practice pages is made of buttons.
   Clicking one holds its sign for the full hold time; pressing and holding keeps it down.
   Buttons go through the keyboard detector, so the stabiliser and engine see the same input.
@@ -73,6 +82,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
+- Faster weaving: a sign registers after a 150 ms hold instead of 250 ms, for the webcam and
+  the keyboard alike. The copy that states the hold time now reads it from the balance config.
 - `SignFrame` carries the optional class-probability vector from the design doc.
 - Practice waits for the model to load before deciding to fall back to the keyboard.
 

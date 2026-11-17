@@ -47,8 +47,8 @@ export const BALANCE = {
   ignoreRepeatedSign: true,
   elementCycle: ['fire', 'wind', 'lightning', 'earth', 'water'] as const,
 
-  /** Input pipeline. */
-  signHoldMs: 250,
+  /** Input pipeline. Hold time tuned down from 250 ms on 2026-11-15 for faster weaving. */
+  signHoldMs: 150,
   defaultConfidenceThreshold: 0.7,
   smoothingAlpha: 0.5,
 

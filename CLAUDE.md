@@ -35,6 +35,9 @@ npm run typecheck      tsc for the app AND tsconfig.engine.json (engine without 
 npm test               Vitest, single run; `npm run test:watch` while developing
 npm run check          lint + format:check + typecheck + test; must pass before any merge
 npm run db:types       regenerate src/lib/database.types.ts from the linked Supabase project
+npm run dev:duel       Vite dev server plus the duel server, for the online mode at /duel
+npm run duel:server    the Colyseus duel server alone (ws://localhost:2567)
+npm run test:e2e       Playwright: a full two-browser online duel (starts both servers if needed)
 ```
 
 ML tooling (`ml/`):
@@ -59,6 +62,10 @@ src/opponent     OpponentSource interface, bot (remote player later)
 src/content      content.config.ts (themed strings), balance.config.ts (every number), roster.ts
 src/lib          supabase client, database types, settings schema (zod), api/*.ts, utils
 src/styles       tokens.css, global.css
+src/duel         the online duel client: net (SDK, session, prediction), input, render, hud, pages
+packages/duel-shared   PURE rules of the online duel: config, simulation, movement, protocol schemas
+server           Colyseus 0.18 server for the online duel: DuelRoom, synced state, limits
+docs/handsign-duel     the online duel specification (verbatim); DECISIONS.md and IMPLEMENTATION_STATUS.md at the root
 supabase/migrations   NNNN_description.sql, RLS on every table
 ml/              uv project: train, evaluate, tests
 public/models/   exported classifier JSON
@@ -86,6 +93,11 @@ docs/            design docs, screenshots
 8. Supabase: the browser only ever holds the anon/publishable key; RLS on every table; access
    goes through typed functions in `src/lib/api/`. Schema changes are migrations, never dashboard
    edits; regenerate types after a migration.
+9. The online duel (`/duel`) is server-authoritative. `packages/duel-shared` is pure TypeScript
+   (no DOM, no timers, no randomness) and holds every duel number in `config.ts`; the server
+   room only validates requests and steps the simulation; the client sends intent and renders.
+   Nothing a client sends may set hp, damage, position or a winner. Rule changes come with a
+   test in `simulation.test.ts`; deviations from the spec go in `DECISIONS.md`.
 
 ## UI rules
 

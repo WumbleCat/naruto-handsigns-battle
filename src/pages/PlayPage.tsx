@@ -21,6 +21,7 @@ import { BotAvatar } from '../features/battle/hud/BotAvatar';
 import { KeyMap } from '../features/battle/KeyMap';
 import { useCamera } from '../features/camera/useCamera';
 import { useHandTracker } from '../features/camera/useHandTracker';
+import { holdLabel } from '../features/jutsu/holdLabel';
 import { PracticeInput } from '../features/practice/PracticeInput';
 import { INPUT_MODES, type InputMode } from '../lib/settings/schema';
 import { settingsStore, useSettings } from '../lib/settings/store';
@@ -275,8 +276,8 @@ export function PlayPage() {
             Keys
           </h2>
           <p className="t-secondary">
-            Hold a key for a quarter second to register its sign. On the stage you can also click
-            the signs; the camera stays off.
+            Hold a key for {holdLabel()} to register its sign. On the stage you can also click the
+            signs; the camera stays off.
           </p>
           <KeyMap bindings={settings.keyBindings} />
         </section>
