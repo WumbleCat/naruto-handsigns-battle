@@ -16,6 +16,9 @@ import { SettingsPage } from '../pages/SettingsPage';
 import { SignupPage } from '../pages/SignupPage';
 import { RecorderPage } from '../pages/dev/RecorderPage';
 import { StyleguidePage } from '../pages/dev/StyleguidePage';
+import { DuelLayout } from '../duel/DuelLayout';
+import { DuelHomePage } from '../duel/pages/DuelHomePage';
+import { DuelRoomPage } from '../duel/pages/DuelRoomPage';
 import { AppLayout } from './layouts/AppLayout';
 import { PlayLayout } from './layouts/PlayLayout';
 import { PublicLayout } from './layouts/PublicLayout';
@@ -79,6 +82,15 @@ export const routes: RouteObject[] = [
             ],
           },
           { path: 'battle', element: <BattlePage /> },
+        ],
+      },
+      {
+        // The online duel is guest-playable: no account, nickname only.
+        path: 'duel',
+        element: <DuelLayout />,
+        children: [
+          { index: true, element: <DuelHomePage /> },
+          { path: ':roomId', element: <DuelRoomPage /> },
         ],
       },
       ...devRoutes,

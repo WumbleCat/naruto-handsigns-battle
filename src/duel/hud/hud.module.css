@@ -1,0 +1,239 @@
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.barHead {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--text-small);
+}
+
+.bar[data-mirror] .barHead {
+  flex-direction: row-reverse;
+}
+
+.barLabel {
+  color: var(--text-2);
+}
+
+.barValue {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.barMax {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.barTrack {
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  overflow: hidden;
+  display: flex;
+}
+
+.bar[data-mirror] .barTrack {
+  justify-content: flex-end;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width var(--dur-fast) linear;
+}
+
+.bar[data-tone='hp'] .barFill {
+  background: var(--danger);
+}
+
+.bar[data-tone='chakra'] .barFill {
+  background: var(--water);
+}
+
+.bar[data-tone='stamina'] .barFill {
+  background: var(--lightning);
+}
+
+.bar[data-tone='shield'] .barFill {
+  background: var(--wind);
+}
+
+.jutsu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.slots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.slot[data-selected] {
+  border-color: var(--text);
+}
+
+.slot[data-cooling] {
+  opacity: 0.75;
+}
+
+.slot:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.slot:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.slotName {
+  font-weight: 700;
+}
+
+.slotMeta {
+  font-size: var(--text-small);
+  color: var(--text-2);
+}
+
+.key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-family: var(--font-text);
+  font-size: var(--text-small);
+  font-weight: 700;
+}
+
+.sequence {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sequenceLabel {
+  font-size: var(--text-small);
+  color: var(--text-2);
+}
+
+.signs {
+  list-style: none;
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.sign {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+}
+
+.sign[data-state='done'] {
+  border-color: var(--ok);
+}
+
+.sign[data-state='next'] {
+  border-color: var(--text);
+}
+
+.sign[data-holding] {
+  background: var(--surface-2);
+}
+
+.sign[data-state='todo'] {
+  color: var(--text-muted);
+}
+
+.signName {
+  font-weight: 500;
+}
+
+.signMark {
+  min-width: 2ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.cancel {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--text-small);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.dodge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.dodge[data-state='ready'] {
+  border-color: var(--ok);
+}
+
+.dodge[data-state='active'] {
+  border-color: var(--text);
+}
+
+.dodgeLabel {
+  font-weight: 700;
+}
+
+.dodgeStatus {
+  font-size: var(--text-small);
+  color: var(--text-2);
+}
+
+.network {
+  font-size: var(--text-small);
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.network[data-poor] {
+  color: var(--warn);
+}
+
+.network[data-status='reconnecting'] {
+  color: var(--danger);
+}
