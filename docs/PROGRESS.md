@@ -1,6 +1,6 @@
 # Progress and roadmap
 
-Last updated: 2026-11-15. Branch: `feat/faster-weaving`.
+Last updated: 2026-11-17. Branch: `feat/online-duel`.
 
 This is the living status page for Jutsu Duel. It answers three questions: where the project
 is, what changed recently, and what comes next. Release notes by version live in
@@ -60,8 +60,17 @@ its signs (`feat/sign-pad`, unreleased). The owner then recorded a session and t
 first real model, which now ships in the repository (`chore/model-v1`, unreleased); webcam
 mode works from a fresh clone.
 
-Next action: the owner's review of the demo. After that, v1.0.0 (online 1v1) per the plan in
-`docs/DESIGN.md` section 10, or any polish the review asks for.
+On 2026-11-17 the owner supplied a full specification for an online 1v1 mode (the Hand-Sign
+Jutsu Duel, `docs/handsign-duel/ALL_IN_ONE_SPEC.md`): a real-time arena with movement, dodge,
+three resources, three jutsu, projectiles and a server-authoritative match. It is built as a
+separate mode at `/duel` on `feat/online-duel`: shared rules in `packages/duel-shared`, a
+Colyseus 0.18 server in `server`, the client in `src/duel`. Every stage of the spec is working
+and verified (`IMPLEMENTATION_STATUS.md`); deviations are in `DECISIONS.md`. 269 unit and
+integration tests plus a two-browser Playwright match pass.
+
+Next action: the owner's review of the online duel and the single-player demo. The original
+v1.0.0 plan (`docs/DESIGN.md` section 10, an online version of the sign-weaving game) is now
+superseded by the duel spec unless the owner says otherwise.
 
 ## Milestone tracker
 
@@ -74,7 +83,8 @@ Next action: the owner's review of the demo. After that, v1.0.0 (online 1v1) per
 | v0.4.0 | Battle page vs bot, results, match saved to Supabase | Done | v0.4.0 | 2026-11-11 |
 | v0.5.0 | Practice, Jutsu Book, Match History, Settings | Done | v0.5.0 | 2026-11-11 |
 | v0.6.0 | Training script, ML detector wired in, polish, README, Vercel config | Done | v0.6.0 | 2026-11-11 |
-| v1.0.0 | Online 1v1: matchmaking, WebRTC video, Realtime signalling, sync, disconnects | Planned | | |
+| Online duel | Spec of 2026-11-17: arena, movement, dodge, resources, 3 jutsu, Colyseus server, mock and webcam signs, tests | In review | | |
+| v1.0.0 | Online 1v1 of the sign-weaving game (superseded by the online duel unless revived) | Planned | | |
 
 Statuses: Planned, Not started, In progress, In review, Done, Blocked.
 
@@ -82,6 +92,22 @@ Statuses: Planned, Not started, In progress, In review, Done, Blocked.
 
 Newest first. One heading per day; each bullet names its branch and says what changed and why
 it matters.
+
+### 2026-11-17
+
+- `feat/online-duel`: The online 1v1 mode from the owner's specification. `packages/duel-shared`
+  holds every number of the duel and a pure simulation (movement, bounds, body collision, dodge
+  with i-frames, casts, swept projectiles, shield, regen, KO / timeout / draw / forfeit, rematch)
+  with 36 rule tests; `server` is a Colyseus 0.18 room that steps it at 30 Hz, takes movement
+  through the native input channel, validates every other message with zod and answers with soft
+  rejections, rate-limits and dedupes by id, pauses for a 10 s reconnection grace, forfeits a
+  second drop and resets on a double rematch vote, with 11 two-client integration tests; the
+  client under `src/duel` has the home, lobby, battle and result screens, a Canvas 2D arena with
+  local prediction and remote interpolation, the HUD from the spec, mock signs on Q E R T Y U I
+  and webcam signs through the trained model. A Playwright match in two browser contexts plays
+  create, join, third seat rejected, countdown, movement, dodge, a landed Fireball, knockout and
+  rematch. The spec is kept verbatim in `docs/handsign-duel/`, deviations in `DECISIONS.md`,
+  status in `IMPLEMENTATION_STATUS.md`.
 
 ### 2026-11-15
 

@@ -50,3 +50,15 @@ what was done, and why.
   for it. The build gate is a full typecheck of the server project plus the web build.
 - **Keyboard movement and dodge keep working in webcam sign mode**, as the spec allows; the mock
   sign keys are only active in mock mode, and the HUD states which mode is live.
+- **Malformed messages earn a soft rejection, not a disconnect.** Colyseus closes the connection
+  when a message fails the schema passed to `onMessage`. The room validates inside its handlers
+  instead and replies `ACTION_REJECTED { reason: 'invalid' }`, so a buggy or tampering client
+  loses nothing but the action. Unknown message types are logged and ignored; message floods
+  still close the connection.
+- **The `GestureRecognizer` interface became an event source.** The spec sketches a
+  frame-polling recogniser; this repository's pipeline is event-driven (tracker frames feed a
+  classifier and a stabiliser that emits registered signs). `DuelSignSource` keeps the same
+  swap-ability with `start`, `stop` and `onSign`; `MockSignSource` and `WebcamSignSource`
+  implement it and combat code never sees which one is live.
+- **No Playwright browser download.** End-to-end tests run on the installed Chrome
+  (`channel: 'chrome'`), which the headless checks in this repository already use.

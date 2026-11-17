@@ -105,14 +105,50 @@ also shows the live prediction of the installed model, so a new model can be jud
 
 ![Recorder](docs/screenshots/recorder.png)
 
+## Online duel
+
+A second mode at `/duel`: two players in separate browsers fight in real time in a top-down
+arena, built from the specification in [`docs/handsign-duel/`](docs/handsign-duel/ALL_IN_ONE_SPEC.md).
+The server owns every rule; clients only send intent.
+
+```
+npm run dev:duel                  # Vite on 5173 plus the duel server on ws://localhost:2567
+```
+
+Open http://localhost:5173/duel in two windows (or two machines pointed at the same server),
+pick nicknames, create a duel in one and join with the invite code in the other, press Ready in
+both. No account and no camera are needed in mock mode.
+
+| Input | Action |
+|---|---|
+| W A S D | Move (220 units/s, diagonals normalised) |
+| Space | Dodge: 150-unit dash, 35 stamina, 1.5 s cooldown, invulnerable 30–150 ms in |
+| 1 / 2 / 3 | Select Fireball (Tiger, Boar, Horse), Lightning Spear (Rat, Bird, Tiger), Water Shield (Snake, Ram) |
+| Q E R T Y U I | Mock signs Tiger, Boar, Horse, Rat, Bird, Snake, Ram |
+| Backspace / Escape | Cancel the signs so far / help |
+
+Webcam hand signs use the trained model and the same server validation; choose it on the duel
+home page when a model is installed. HP regenerates 2/s after 6 s without damage, chakra 7/s,
+stamina 20/s; a match lasts 180 s and ends by knockout, time, or forfeit after a 10 s
+reconnection grace. Every number lives in `packages/duel-shared/src/config.ts`. What works, what
+is limited and what was deliberately changed from the spec: [`IMPLEMENTATION_STATUS.md`](IMPLEMENTATION_STATUS.md)
+and [`DECISIONS.md`](DECISIONS.md).
+
+![Online duel](docs/screenshots/duel-battle.png)
+
+`npm run test:e2e` plays a complete two-browser match with Playwright. The duel server reads
+`DUEL_SERVER_PORT`; the client reads `VITE_DUEL_SERVER_URL` (see `.env.example`).
+
 ## Commands
 
 ```
 npm run dev            dev server with the dev-only routes (/dev/styleguide, /dev/recorder)
+npm run dev:duel       dev server plus the online duel server (npm run duel:server for it alone)
 npm run build          production build to dist/
 npm run preview        serve the production build locally
 npm run check          lint, format check, typecheck and tests; the merge gate for main
 npm test               tests only (npm run test:watch to keep them running)
+npm run test:e2e       Playwright: a full online duel in two browser contexts
 npm run format         write Prettier formatting
 npm run db:types       regenerate src/lib/database.types.ts from a linked Supabase project
 
@@ -136,6 +172,9 @@ src/opponent/    The OpponentSource contract and the seeded bot (a remote player
 src/features/    Battle controller and HUD, practice, settings sync, results, history, recorder.
 src/pages/       One file per route. src/components/ holds the design-system primitives.
 src/lib/         Supabase client, settings store, API modules, small hooks.
+src/duel/        The online duel client: session and prediction, inputs, canvas renderer, HUD, pages.
+packages/duel-shared/  Pure rules of the online duel: config, simulation, movement, protocol schemas.
+server/          Colyseus 0.18 server for the online duel: the room, synced state, rate limits.
 supabase/        Migrations with RLS. ml/ is the uv-managed trainer. docs/ holds the design and progress.
 ```
 
