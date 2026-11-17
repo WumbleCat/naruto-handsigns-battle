@@ -9,21 +9,26 @@
   },
   "scripts": {
     "dev": "vite",
+    "duel:server": "npm run dev --workspace server",
+    "dev:duel": "concurrently -n web,duel -c cyan,magenta \"npm run dev\" \"npm run duel:server\"",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc -b && tsc -p tsconfig.engine.json",
+    "typecheck": "tsc -b && tsc -p tsconfig.engine.json && tsc -p packages/duel-shared/tsconfig.json && tsc -p server/tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "model:check": "vitest run src/detection/model.file.test.ts --mode recordings",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run test",
     "db:types": "supabase gen types typescript --linked > src/lib/database.types.ts"
   },
   "dependencies": {
+    "@colyseus/sdk": "^0.18.10",
     "@fontsource/yuji-syuku": "^5.3.1",
     "@fontsource/zen-kaku-gothic-new": "^5.3.1",
+    "@jutsu-duel/duel-shared": "*",
     "@mediapipe/tasks-vision": "^1.2.2",
     "@supabase/supabase-js": "^2.119.0",
     "react": "^19.3.1",
@@ -33,6 +38,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.58.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.9",
@@ -40,6 +46,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.3.0",
+    "concurrently": "^9.2.1",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
@@ -51,5 +58,9 @@
     "typescript-eslint": "^8.72.2",
     "vite": "^8.3.8",
     "vitest": "^5.1.0"
-  }
+  },
+  "workspaces": [
+    "packages/*",
+    "server"
+  ]
 }

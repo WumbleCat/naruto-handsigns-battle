@@ -7,7 +7,17 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['dist', 'coverage', 'node_modules', 'ml', 'public', 'supabase', '.claude']),
+  globalIgnores([
+    'dist',
+    'coverage',
+    'node_modules',
+    'ml',
+    'public',
+    'supabase',
+    '.claude',
+    'playwright-report',
+    'test-results',
+  ]),
 
   {
     files: ['**/*.{ts,tsx}'],
@@ -32,7 +42,13 @@ export default defineConfig([
   },
 
   {
-    files: ['vite.config.ts'],
+    files: [
+      'vite.config.ts',
+      'playwright.config.ts',
+      'server/**/*.ts',
+      'packages/**/*.ts',
+      'tests/**/*.ts',
+    ],
     languageOptions: { globals: globals.node },
   },
 
