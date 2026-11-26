@@ -1,6 +1,6 @@
 # Progress and roadmap
 
-Last updated: 2026-11-17. Branch: `feat/online-duel`.
+Last updated: 2026-11-26. Branch: `feat/duel-bots`.
 
 This is the living status page for Jutsu Duel. It answers three questions: where the project
 is, what changed recently, and what comes next. Release notes by version live in
@@ -83,7 +83,8 @@ superseded by the duel spec unless the owner says otherwise.
 | v0.4.0 | Battle page vs bot, results, match saved to Supabase | Done | v0.4.0 | 2026-11-11 |
 | v0.5.0 | Practice, Jutsu Book, Match History, Settings | Done | v0.5.0 | 2026-11-11 |
 | v0.6.0 | Training script, ML detector wired in, polish, README, Vercel config | Done | v0.6.0 | 2026-11-11 |
-| Online duel | Spec of 2026-11-17: arena, movement, dodge, resources, 3 jutsu, Colyseus server, mock and webcam signs, tests | In review | | |
+| Online duel | Spec of 2026-11-17: arena, movement, dodge, resources, 3 jutsu, Colyseus server, mock and webcam signs, tests | Done | | 2026-11-17 |
+| Duel bots | Offline duel against an easy, normal or hard bot in the same arena, no server | In review | | |
 | v1.0.0 | Online 1v1 of the sign-weaving game (superseded by the online duel unless revived) | Planned | | |
 
 Statuses: Planned, Not started, In progress, In review, Done, Blocked.
@@ -92,6 +93,20 @@ Statuses: Planned, Not started, In progress, In review, Done, Blocked.
 
 Newest first. One heading per day; each bullet names its branch and says what changed and why
 it matters.
+
+### 2026-11-26
+
+- `feat/duel-bots`: The duel can be played offline against a bot. `/duel` now offers a
+  difficulty picker (easy, normal, hard) beside create and join, and `/duel/bot/<level>` runs
+  the whole match in the tab with no duel server. The bot lives in the shared rules package and
+  acts through the same requests as a player, so it obeys every cooldown, cost and sign gap;
+  difficulty changes only how it decides (sign speed, misfires, reactions, evading, shielding,
+  range, moving while weaving, waiting for an opening). Simulated matches rank the levels: hard
+  beat normal 37 of 40 and normal beat easy 40 of 40. The battle screen is the online one, now
+  fed through the session instead of the Colyseus room. 287 tests pass and a second Playwright
+  test plays the bot. The online duel (merged to `main` as pull request 5) was re-verified: the
+  full check and the two-browser match are green. Bot strength against a real person is
+  untested; the numbers are in `BOT_PARAMS`.
 
 ### 2026-11-17
 
@@ -307,6 +322,8 @@ snapshots, disconnect handling with a 20 s forfeit, and online matches recorded 
 
 ### Later
 
+- Hosting the duel server: it needs a long-running Node process with WebSockets (not Vercel
+  functions), TLS, and `VITE_DUEL_SERVER_URL` set at build time.
 - Anti-cheat: server-side replay of event logs, cadence limits, signed results.
 - Ranked ladder and seasons; friends list, direct challenges, private lobbies.
 - Sound design and real visual effects on the engine event bus.

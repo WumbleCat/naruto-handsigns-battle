@@ -11,7 +11,7 @@ export function DuelLayout() {
         brand={<Link to="/">{CONTENT.game.title}</Link>}
         nav={
           <Link to="/duel" className={layoutStyles.textLink}>
-            Online duel
+            Duel
           </Link>
         }
         end={

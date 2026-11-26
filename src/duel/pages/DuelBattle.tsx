@@ -3,12 +3,10 @@
 // pauses, help and the result. All combat intent goes out as requests; the HUD reads the
 // synced state and the renderer predicts only the local player's walk.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { InputHandle } from '@colyseus/sdk';
 import {
   DT_MS,
   DUEL_CONFIG,
   JUTSUS,
-  MoveInput,
   REJECT_TEXT,
   type DuelNetState,
   type DuelSign,
@@ -25,7 +23,7 @@ import { ResourceBar } from '../hud/ResourceBar';
 import { useDuelKeys } from '../input/useDuelKeys';
 import { useWebcamSigns } from '../input/useWebcamSigns';
 import type { SignObservation } from '../input/signSource';
-import type { DuelIdentity, DuelRoom } from '../net/duelClient';
+import type { DuelIdentity } from '../net/duelClient';
 import type { DuelSession } from '../net/useDuelSession';
 import { ArenaCanvas } from '../render/ArenaCanvas';
 import { DuelPresenter } from '../render/DuelPresenter';
@@ -42,17 +40,6 @@ export interface DuelBattleProps {
   identity: DuelIdentity;
 }
 
-const inputHandles = new WeakMap<DuelRoom, InputHandle<MoveInput>>();
-
-function inputHandleFor(room: DuelRoom): InputHandle<MoveInput> {
-  let handle = inputHandles.get(room);
-  if (!handle) {
-    handle = room.input<MoveInput>({ type: MoveInput, historySize: 64 });
-    inputHandles.set(room, handle);
-  }
-  return handle;
-}
-
 function formatClock(ticks: number): string {
   const total = Math.max(0, Math.ceil((ticks * DT_MS) / 1000));
   const minutes = Math.floor(total / 60);
@@ -61,9 +48,8 @@ function formatClock(ticks: number): string {
 }
 
 export function DuelBattle({ session, identity }: DuelBattleProps) {
-  const room = session.room as DuelRoom;
   const state = session.state as DuelNetState;
-  const { sessionId, version } = session;
+  const { sessionId, version, getState, sendMove, lastProcessedInput } = session;
   const [presenter] = useState(() => new DuelPresenter());
   const [help, setHelp] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -77,13 +63,11 @@ export function DuelBattle({ session, identity }: DuelBattleProps) {
   const phase = state.phase;
   const live = phase === 'PLAYING' || phase === 'COUNTDOWN';
   const mock = identity.inputMode === 'mock';
-  const getState = useCallback(() => room.state, [room]);
 
-  // Native input channel: one handle per room, acked through lastProcessed.
+  // The host acknowledges movement by sequence number; the presenter replays the rest.
   useEffect(() => {
-    const handle = inputHandleFor(room);
-    presenter.setLocal(sessionId, { lastProcessed: () => handle.lastProcessed });
-  }, [room, presenter, sessionId]);
+    presenter.setLocal(sessionId, { lastProcessed: lastProcessedInput });
+  }, [presenter, sessionId, lastProcessedInput]);
 
   // Every patch: feed snapshots for interpolation.
   useEffect(() => {
@@ -155,18 +139,15 @@ export function DuelBattle({ session, identity }: DuelBattleProps) {
 
   // Movement intent at the server's tick rate while playing.
   useEffect(() => {
-    const handle = inputHandleFor(room);
     const period = 1000 / DUEL_CONFIG.tickRate;
     const timer = window.setInterval(() => {
-      if (getState().phase !== 'PLAYING') return;
+      if (getState()?.phase !== 'PLAYING') return;
       const direction = keys.direction();
-      handle.data.moveX = direction.moveX;
-      handle.data.moveY = direction.moveY;
-      const seq = handle.send();
+      const seq = sendMove(direction.moveX, direction.moveY);
       presenter.history.push({ seq, moveX: direction.moveX, moveY: direction.moveY });
     }, period);
     return () => window.clearInterval(timer);
-  }, [room, keys, presenter, getState]);
+  }, [keys, presenter, getState, sendMove]);
 
   const countdownSeconds = Math.ceil(state.countdownTicksRemaining / state.tickRate);
   const showGo = phase === 'PLAYING' && playingSince !== null && now - playingSince < GO_WORD_MS;
@@ -183,7 +164,13 @@ export function DuelBattle({ session, identity }: DuelBattleProps) {
           <span className={styles.timer} role="timer" data-testid="timer">
             {formatClock(state.activeTicksRemaining)}
           </span>
-          <NetworkBadge room={room} status={session.status} />
+          {session.offlineLabel ? (
+            <span className={styles.offline} data-testid="network">
+              {session.offlineLabel}
+            </span>
+          ) : (
+            <NetworkBadge room={session.room} status={session.status} />
+          )}
         </div>
         <Side player={opponent} label="Opponent" mirror testPrefix="remote" />
       </div>
@@ -386,7 +373,9 @@ function ResultOverlay({
           {word}
         </span>
         <p className="t-lead">
-          {how ? `${word === 'Draw' ? 'Ended' : 'Won'} ${how}` : 'Match over'}
+          {how
+            ? `${word === 'Draw' ? 'Ended' : word === 'Defeat' ? 'Lost' : 'Won'} ${how}`
+            : 'Match over'}
           {elapsed ? ` after ${elapsed}.` : '.'}
         </p>
         {mine && theirs ? (
@@ -438,11 +427,13 @@ function ResultOverlay({
         <p className="t-small t-muted">
           {opponent === null
             ? 'Your opponent has left.'
-            : opponentWants && !iWant
-              ? `${opponent.nickname} wants a rematch.`
-              : iWant && !opponentWants
-                ? 'Waiting for your opponent to accept.'
-                : 'A rematch starts fresh when both accept.'}
+            : session.offlineLabel
+              ? 'A rematch starts straight away.'
+              : opponentWants && !iWant
+                ? `${opponent.nickname} wants a rematch.`
+                : iWant && !opponentWants
+                  ? 'Waiting for your opponent to accept.'
+                  : 'A rematch starts fresh when both accept.'}
         </p>
         <div className={styles.overlayActions}>
           <Button

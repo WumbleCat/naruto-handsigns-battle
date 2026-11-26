@@ -17,6 +17,7 @@ import { SignupPage } from '../pages/SignupPage';
 import { RecorderPage } from '../pages/dev/RecorderPage';
 import { StyleguidePage } from '../pages/dev/StyleguidePage';
 import { DuelLayout } from '../duel/DuelLayout';
+import { DuelBotPage } from '../duel/pages/DuelBotPage';
 import { DuelHomePage } from '../duel/pages/DuelHomePage';
 import { DuelRoomPage } from '../duel/pages/DuelRoomPage';
 import { AppLayout } from './layouts/AppLayout';
@@ -90,6 +91,7 @@ export const routes: RouteObject[] = [
         element: <DuelLayout />,
         children: [
           { index: true, element: <DuelHomePage /> },
+          { path: 'bot/:level', element: <DuelBotPage /> },
           { path: ':roomId', element: <DuelRoomPage /> },
         ],
       },

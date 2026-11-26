@@ -115,7 +115,10 @@ The server owns every rule; clients only send intent.
 npm run dev:duel                  # Vite on 5173 plus the duel server on ws://localhost:2567
 ```
 
-Open http://localhost:5173/duel in two windows (or two machines pointed at the same server),
+To play alone, `npm run dev` is enough: open http://localhost:5173/duel, pick easy, normal or
+hard under "Against a bot" and start. The match runs in the tab with the same rules, no server.
+
+For two players, open http://localhost:5173/duel in two windows (or two machines pointed at the same server),
 pick nicknames, create a duel in one and join with the invite code in the other, press Ready in
 both. No account and no camera are needed in mock mode.
 

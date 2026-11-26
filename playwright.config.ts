@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 /**
- * End-to-end tests for the online duel. Starts the Vite dev server and the duel server (or
+ * End-to-end tests for the duel, online and against the bot. Starts the Vite dev server and the duel server (or
  * reuses running ones) and drives two independent browser contexts with the installed Chrome.
  */
 export default defineConfig({

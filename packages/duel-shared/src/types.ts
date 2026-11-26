@@ -87,3 +87,11 @@ export interface DuelNetState {
   players: ReadonlyMap<string, PlayerNetState>;
   projectiles: ReadonlyMap<string, ProjectileNetState>;
 }
+
+/** Difficulty levels of the offline bot opponent, weakest first. */
+export const BOT_LEVELS = ['easy', 'normal', 'hard'] as const;
+export type BotLevel = (typeof BOT_LEVELS)[number];
+
+export function isBotLevel(value: unknown): value is BotLevel {
+  return typeof value === 'string' && (BOT_LEVELS as readonly string[]).includes(value);
+}

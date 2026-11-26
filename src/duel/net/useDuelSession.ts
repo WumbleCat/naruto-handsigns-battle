@@ -2,8 +2,10 @@
 // authoritative state through a version counter that bumps on every patch, and relays the
 // server's discrete messages. Combat intent is sent through the returned helpers only.
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { InputHandle } from '@colyseus/sdk';
 import {
   CLIENT_MESSAGES,
+  MoveInput,
   SERVER_MESSAGES,
   type ActionRejectedMessage,
   type DuelNetState,
@@ -37,9 +39,18 @@ export interface DuelNotice extends RoomNoticeMessage {
 export interface DuelSession {
   status: ConnectionStatus;
   error: string | null;
+  /** The Colyseus room, or null for an offline match hosted in this tab. */
   room: DuelRoom | null;
+  /** Set for an offline match: what to show where the ping would be. */
+  offlineLabel: string | null;
   sessionId: string;
   state: DuelNetState | null;
+  /** The latest state, for the render loop to read outside React's render cycle. */
+  getState: () => DuelNetState | null;
+  /** Sends this tick's movement intent and returns its sequence number. */
+  sendMove: (moveX: number, moveY: number) => number;
+  /** The newest movement sequence number the host has applied. */
+  lastProcessedInput: () => number;
   /** Increments on every state patch, so dependants re-render at the patch rate. */
   version: number;
   notices: DuelNotice[];
@@ -55,6 +66,18 @@ export interface DuelSession {
   cancelSigns: () => void;
   voteRematch: (accept: boolean) => void;
   leave: () => Promise<void>;
+}
+
+const inputHandles = new WeakMap<DuelRoom, InputHandle<MoveInput>>();
+
+/** Native input channel: one handle per room, acked through lastProcessed. */
+function inputHandleFor(room: DuelRoom): InputHandle<MoveInput> {
+  let handle = inputHandles.get(room);
+  if (!handle) {
+    handle = room.input<MoveInput>({ type: MoveInput, historySize: 64 });
+    inputHandles.set(room, handle);
+  }
+  return handle;
 }
 
 let nextId = 1;
@@ -181,6 +204,22 @@ export function useDuelSession(roomId: string, identity: DuelIdentity | null): D
     [room, status],
   );
 
+  const getState = useCallback(() => (room ? room.state : null), [room]);
+  const sendMove = useCallback(
+    (moveX: number, moveY: number) => {
+      if (!room) return 0;
+      const handle = inputHandleFor(room);
+      handle.data.moveX = moveX;
+      handle.data.moveY = moveY;
+      return handle.send();
+    },
+    [room],
+  );
+  const lastProcessedInput = useCallback(
+    () => (room ? inputHandleFor(room).lastProcessed : Number.MAX_SAFE_INTEGER),
+    [room],
+  );
+
   const leave = useCallback(async () => {
     forgetSession();
     await dropRoom(roomId);
@@ -191,8 +230,12 @@ export function useDuelSession(roomId: string, identity: DuelIdentity | null): D
     status,
     error,
     room,
+    offlineLabel: null,
     sessionId: room?.sessionId ?? '',
     state: room ? room.state : null,
+    getState,
+    sendMove,
+    lastProcessedInput,
     version,
     notices,
     rejection,
