@@ -4,6 +4,22 @@ Deviations from, and choices left open by, the online duel specification in
 `docs/handsign-duel/ALL_IN_ONE_SPEC.md`. Newest first. Each entry says what the spec suggested,
 what was done, and why.
 
+## 2026-11-26
+
+- **Bots are offline and hosted in the browser, not seated in a server room.** The spec has no
+  bots. The owner asked for an offline 1v1 against one, so the client runs the shared
+  simulation itself (`src/duel/local/LocalDuelMatch.ts`) and reports in the server's message
+  shapes; the battle page takes a session and cannot tell the two apart. The online path stays
+  server-authoritative and unchanged. A server-side bot for an empty seat was not built.
+- **The bot is a client of the rules, not part of them.** `DuelBot.think` returns an intent and
+  `applyBotIntent` feeds it through `setMoveInput`, `requestDodge`, `selectJutsu` and
+  `observeSign`. Difficulty is decision quality only: no extra damage, chakra or speed.
+- **The shared package got a seeded PRNG** because it may not call `Math.random`. The client
+  supplies the seed (wall clock), so a match replays from its seed in tests.
+- **Offline there is no input prediction.** The session reports every input as acknowledged and
+  the renderer eases between 30 Hz ticks; the bot is drawn through the same 100 ms
+  interpolation as a remote player.
+
 ## 2026-11-17
 
 - **Built inside the existing repository as an online mode, not as a new monorepo.** The spec's

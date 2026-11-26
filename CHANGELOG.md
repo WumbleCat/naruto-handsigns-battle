@@ -8,6 +8,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- Duel bots: an offline duel against an easy, normal or hard bot, started from `/duel` and
+  played at `/duel/bot/<level>` with no server. The bot follows the same rules and requests as
+  a player; its difficulty numbers are in `BOT_PARAMS` in `packages/duel-shared/src/config.ts`.
 - Online duel (`/duel`): a server-authoritative 1v1 mode from the owner's specification in
   `docs/handsign-duel/`. Two guests create and join a private room by code, ready up, and fight
   in a 1200 × 700 arena with WASD movement, a stamina-costing dodge with i-frames, HP / chakra /

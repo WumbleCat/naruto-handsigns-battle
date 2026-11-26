@@ -2,7 +2,7 @@
 
 Status of the Hand-Sign Jutsu Duel online mode specified in
 `docs/handsign-duel/ALL_IN_ONE_SPEC.md`. Legend: [x] working and verified, [~] working with a
-documented limitation, [ ] not done. Last validation run: 2026-11-17.
+documented limitation, [ ] not done. Last validation run: 2026-11-26.
 
 ## Working
 
@@ -39,7 +39,17 @@ documented limitation, [ ] not done. Last validation run: 2026-11-17.
   browser contexts (create, join by code, third seat rejected, ready, countdown, walk, dodge,
   Fireball lands for 28, knockout, shared Victory / Defeat, rematch resets to full bars).
 
+- [x] Offline duel against a bot (`/duel/bot/easy|normal|hard`): the match is hosted in the tab
+  by `LocalDuelMatch` on the shared simulation, with no server. The bot (`bot.ts` in the shared
+  package) acts only through the request functions a player's messages reach. 10 bot tests
+  (determinism, rule compliance, level ranking, evasion by level), 8 local match tests and a
+  Playwright match against the bot.
+
 ## Mocked or limited
+
+- [~] Bot difficulty is tuned on simulated matches (bot against bot and against scripted
+  casters), not on people. A player who never moves loses to the easy bot in under a minute; the hard bot
+  is close to unhittable at range unless it is mid-cast.
 
 - [~] Webcam sign recognition is only as good as the shipped model, which was trained on one
   person's hands. The HUD says "Webcam signs live" only when the model, camera and tracker are
@@ -68,7 +78,8 @@ documented limitation, [ ] not done. Last validation run: 2026-11-17.
 ## How to validate
 
 ```
-npm run check            # lint, format, typecheck, 269 unit + integration tests
-npm run test:e2e         # starts both servers if needed, plays a full match in two browsers
+npm run check            # lint, format, typecheck, 287 unit + integration tests
+npm run test:e2e         # starts both servers if needed; a two-browser match and a bot match
+npm run dev              # then open http://localhost:5173/duel and start a bot duel
 npm run dev:duel         # then open http://localhost:5173/duel in two windows
 ```

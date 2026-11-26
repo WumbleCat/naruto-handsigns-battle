@@ -37,7 +37,7 @@ npm run check          lint + format:check + typecheck + test; must pass before 
 npm run db:types       regenerate src/lib/database.types.ts from the linked Supabase project
 npm run dev:duel       Vite dev server plus the duel server, for the online mode at /duel
 npm run duel:server    the Colyseus duel server alone (ws://localhost:2567)
-npm run test:e2e       Playwright: a full two-browser online duel (starts both servers if needed)
+npm run test:e2e       Playwright: a two-browser online duel and an offline bot duel (starts both servers if needed)
 ```
 
 ML tooling (`ml/`):
@@ -62,8 +62,8 @@ src/opponent     OpponentSource interface, bot (remote player later)
 src/content      content.config.ts (themed strings), balance.config.ts (every number), roster.ts
 src/lib          supabase client, database types, settings schema (zod), api/*.ts, utils
 src/styles       tokens.css, global.css
-src/duel         the online duel client: net (SDK, session, prediction), input, render, hud, pages
-packages/duel-shared   PURE rules of the online duel: config, simulation, movement, protocol schemas
+src/duel         the duel client: net (SDK, session, prediction), local (offline bot match), input, render, hud, pages
+packages/duel-shared   PURE rules of the duel: config, simulation, movement, bot, protocol schemas
 server           Colyseus 0.18 server for the online duel: DuelRoom, synced state, limits
 docs/handsign-duel     the online duel specification (verbatim); DECISIONS.md and IMPLEMENTATION_STATUS.md at the root
 supabase/migrations   NNNN_description.sql, RLS on every table
