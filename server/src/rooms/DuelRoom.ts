@@ -6,6 +6,7 @@ import { Room, ServerError, type Client, type StepContext } from 'colyseus';
 import {
   addPlayer,
   beginCountdown,
+  buildMatchResult,
   canStart,
   cancelSigns,
   CLIENT_MESSAGES,
@@ -34,6 +35,7 @@ import {
   setReady,
   signSchema,
   stepDuel,
+  toGameEventMessage,
   type ActionRejectedMessage,
   type DuelEvent,
   type DuelSim,
@@ -463,51 +465,16 @@ export class DuelRoom extends Room<{ state: DuelState; input: MoveInput }> {
   }
 
   private publish(event: DuelEvent): void {
-    const { type, tick, ...rest } = event;
-    const data: Record<string, number | string | boolean> = {};
-    let actorId: string | undefined;
-    let targetId: string | undefined;
-    for (const [key, value] of Object.entries(rest)) {
-      if (key === 'actorId') actorId = String(value);
-      else if (key === 'targetId') targetId = String(value);
-      else if (typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean')
-        data[key] = value;
-    }
-    const message: GameEventMessage = {
-      eventId: this.nextEventId,
-      tick,
-      type,
-      actorId,
-      targetId,
-      data,
-    };
+    const message: GameEventMessage = toGameEventMessage(event, this.nextEventId);
     this.nextEventId += 1;
     this.broadcast(SERVER_MESSAGES.GAME_EVENT, message);
-    if (type === 'MATCH_ENDED') this.sendResult();
+    if (event.type === 'MATCH_ENDED') this.sendResult();
   }
 
   private sendResult(): void {
     if (this.resultSent) return;
     this.resultSent = true;
-    const sim = this.sim;
-    const message: MatchResultMessage = {
-      winnerId: sim.winnerId,
-      reason: sim.resultReason,
-      elapsedMs: this.playedTicks * DT_MS,
-      tick: sim.tick,
-      players: sim.players.map((p) => ({
-        playerId: p.id,
-        nickname: p.nickname,
-        slot: p.slot,
-        hpLeft: Math.round(p.hp),
-        damageDealt: p.stats.damageDealt,
-        damageTaken: p.stats.damageTaken,
-        casts: { ...p.stats.casts },
-        dodgesUsed: p.stats.dodgesUsed,
-        dodgesSuccessful: p.stats.dodgesSuccessful,
-        shieldAbsorbed: p.stats.shieldAbsorbed,
-      })),
-    };
+    const message: MatchResultMessage = buildMatchResult(this.sim, this.playedTicks * DT_MS);
     this.broadcast(SERVER_MESSAGES.MATCH_RESULT, message);
     // Dispose a finished room that nobody rematches within the full match length.
     this.clock.setTimeout(
