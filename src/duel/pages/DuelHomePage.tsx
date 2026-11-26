@@ -1,4 +1,5 @@
-// Home of the online duel: nickname, input mode, create or join by code (spec section 06.1).
+// Home of the duel: nickname, input mode, then an offline match against a bot or an online
+// one created or joined by code (spec section 06.1).
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { Banner } from '../../components/Banner/Banner';
@@ -6,7 +7,13 @@ import { Button } from '../../components/Button/Button';
 import { PageShell } from '../../components/PageShell/PageShell';
 import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
 import { TextField } from '../../components/TextField/TextField';
-import { DUEL_CONFIG, type InputMode } from '@jutsu-duel/duel-shared';
+import {
+  BOT_LEVELS,
+  BOT_PARAMS,
+  DUEL_CONFIG,
+  type BotLevel,
+  type InputMode,
+} from '@jutsu-duel/duel-shared';
 import { modelStore, useModelState } from '../../detection/model';
 import {
   createDuelRoom,
@@ -25,11 +32,19 @@ const MODE_OPTIONS: readonly { value: InputMode; label: string; disabled?: boole
   { value: 'webcam', label: 'Webcam hand signs' },
 ];
 
+const LEVEL_LABELS: Readonly<Record<BotLevel, string>> = {
+  easy: 'Easy',
+  normal: 'Normal',
+  hard: 'Hard',
+};
+const LEVEL_OPTIONS = BOT_LEVELS.map((level) => ({ value: level, label: LEVEL_LABELS[level] }));
+
 export function DuelHomePage() {
   const navigate = useNavigate();
   const model = useModelState();
   const [identity, setIdentity] = useState(loadIdentity);
   const [code, setCode] = useState('');
+  const [level, setLevel] = useState<BotLevel>('easy');
   const [busy, setBusy] = useState<'create' | 'join' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,6 +78,11 @@ export function DuelHomePage() {
     }
   };
 
+  const startBot = () => {
+    persist();
+    void navigate(`/duel/bot/${level}`);
+  };
+
   const join = (event: FormEvent) => {
     event.preventDefault();
     const trimmed = code.trim();
@@ -75,10 +95,10 @@ export function DuelHomePage() {
   return (
     <PageShell>
       <header className={styles.header}>
-        <h1 className="t-display-md">Online duel</h1>
+        <h1 className="t-display-md">Duel</h1>
         <p className="t-lead measure">
-          Two players, one arena. Move with the keys, weave hand signs to cast, dodge what comes
-          back. Matches run on the duel server; your camera never leaves this device.
+          Two fighters, one arena. Move with the keys, weave hand signs to cast, dodge what comes
+          back. Fight a bot offline or another player online; your camera never leaves this device.
         </p>
       </header>
 
@@ -92,7 +112,7 @@ export function DuelHomePage() {
           onChange={(event) =>
             setIdentity((current) => ({ ...current, nickname: event.target.value }))
           }
-          helper="Shown to your opponent. No account needed."
+          helper="Shown to your opponent. No account needed, and a bot does not mind if it is empty."
           data-testid="nickname"
         />
         <SegmentedControl<InputMode>
@@ -111,10 +131,36 @@ export function DuelHomePage() {
               ? 'Checking for the recognition model.'
               : 'No recognition model is installed, so only mock hand signs are available. Train one as the README describes to unlock webcam signs.'}
         </p>
+      </div>
 
-        <div className={styles.actions}>
+      <div className={styles.modes}>
+        <section className={styles.mode} aria-labelledby="bot-heading">
+          <h2 id="bot-heading" className="t-heading">
+            Against a bot
+          </h2>
+          <p className="t-small t-muted">Runs in this tab. No server or second player needed.</p>
+          <SegmentedControl<BotLevel>
+            label="Difficulty"
+            options={LEVEL_OPTIONS}
+            value={level}
+            onChange={setLevel}
+          />
+          <p className={styles.levelNote} data-testid="bot-summary">
+            {BOT_PARAMS[level].summary}
+          </p>
+          <Button variant="primary" size="lg" onClick={startBot} data-testid="start-bot-duel">
+            Start bot duel
+          </Button>
+        </section>
+
+        <section className={styles.mode} aria-labelledby="online-heading">
+          <h2 id="online-heading" className="t-heading">
+            Against a player
+          </h2>
+          <p className="t-small t-muted">
+            Create a duel and share its code, or join with a code you were sent.
+          </p>
           <Button
-            variant="primary"
             size="lg"
             onClick={() => void create()}
             disabled={!nicknameOk || busy !== null}
@@ -138,7 +184,7 @@ export function DuelHomePage() {
               Join duel
             </Button>
           </form>
-        </div>
+        </section>
       </div>
 
       <section className={styles.help} aria-labelledby="duel-controls">
@@ -147,8 +193,8 @@ export function DuelHomePage() {
         </h2>
         <ControlsTable inputMode={inputMode} />
         <p className="t-small t-muted">
-          Server: {duelServerUrl()}. Start it with <code>npm run duel:server</code>, or both servers
-          with <code>npm run dev:duel</code>.
+          Online duels use the server at {duelServerUrl()}. Start it with{' '}
+          <code>npm run duel:server</code>, or both servers with <code>npm run dev:duel</code>.
         </p>
       </section>
     </PageShell>
